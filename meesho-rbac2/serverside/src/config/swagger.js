@@ -7,8 +7,8 @@ export const swaggerDocument = {
   },
   servers: [
     {
-      url: "/api",
-      description: "Dynamic Host (Render/Local)"
+      url: "https://meeshoapis.onrender.com/api",
+      description: "Live Production Server (Render)"
     }
   ],
   components: {
