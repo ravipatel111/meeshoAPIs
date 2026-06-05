@@ -9,6 +9,12 @@ import {
   getProductsByCategory,
   searchProducts,
 } from "../../controllers/products/products.js";
+import {
+  createProductByAdmin,
+  updateProductByAdmin,
+  deleteProductByAdmin,
+  getAllProducts as adminGetAllProducts
+} from "../../controllers/products/adminProductControllers.js";
 import { auth, isAdmin } from "../../middleware/authMiddleware.js";
 // import { auth, isSeller, isSellerApproved } from "../../middleware/authMiddleware.js"; // seller guards removed
 import { uploadProductImages } from "../../middleware/upload.js";
@@ -27,10 +33,10 @@ const router = express.Router();
 // router.delete("/seller/product/:id", auth, isSeller, deleteProduct);
 
 // ADMIN product routes
-router.post("/admin/product/create", auth, isAdmin, uploadProductImages, validate(createProductSchema), createProduct);
-router.get("/admin/product/my", auth, isAdmin, getSellerProducts);
-router.put("/admin/product/:id", auth, isAdmin, uploadProductImages, validate(updateProductSchema), updateProduct);
-router.delete("/admin/product/:id", auth, isAdmin, deleteProduct);
+router.post("/admin/product/create", auth, isAdmin, uploadProductImages, validate(createProductSchema), createProductByAdmin);
+router.get("/admin/product/my", auth, isAdmin, adminGetAllProducts);
+router.put("/admin/product/:id", auth, isAdmin, uploadProductImages, validate(updateProductSchema), updateProductByAdmin);
+router.delete("/admin/product/:id", auth, isAdmin, deleteProductByAdmin);
 
 // PUBLIC routes — no auth required
 router.get("/product/all", getAllProducts);

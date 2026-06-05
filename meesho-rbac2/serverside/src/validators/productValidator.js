@@ -26,6 +26,10 @@ export const createProductSchema = Joi.object({
 
   subCategory: Joi.string().optional().allow(""),
 
+  seller: Joi.string().optional().messages({
+    "string.base": "Seller ID must be a valid string",
+  }),
+
   stock: Joi.number().integer().min(0).default(0).messages({
     "number.min": "Stock cannot be negative",
     "number.integer": "Stock must be a whole number",
@@ -39,5 +43,6 @@ export const updateProductSchema = Joi.object({
   discountPrice: Joi.number().min(0).optional().messages({ "number.min": "Discount price cannot be negative" }),
   category:      Joi.string().optional(),
   subCategory:   Joi.string().optional().allow(""),
+  seller:        Joi.string().optional(),
   stock:         Joi.number().integer().min(0).optional().messages({ "number.min": "Stock cannot be negative" }),
 });

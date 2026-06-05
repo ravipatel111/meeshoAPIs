@@ -1,4 +1,76 @@
 import Product from "../../models/productModels.js";
+import cloudinary from "../../config/cloudinary.js";
+import uploadToCloudinary from "../../utils/uploadToCloudinary.js";
+
+export const createProductByAdmin = async (req, res) => {
+  try {
+    const { title, description, price, discountPrice, category, subCategory, stock, seller } = req.body;
+
+    if (!title || !price || !category || !seller) {
+      return res.status(400).json({ success: false, message: "title, price, category, and seller are required" });
+    }
+
+    let images = [];
+    if (req.files && req.files.length > 0) {
+      for (let file of req.files) {
+        const uploaded = await uploadToCloudinary(file.buffer, "meesho/products");
+        images.push(uploaded);
+      }
+    }
+
+    const product = await Product.create({
+      title,
+      description,
+      price,
+      discountPrice,
+      category,
+      subCategory,
+      images,
+      stock,
+      seller,
+      status: "approved", // admin products are automatically approved
+    });
+
+    res.status(201).json({ success: true, data: product });
+
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const updateProductByAdmin = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+    if (req.files && req.files.length > 0) {
+      for (let img of product.images) {
+        if (img.public_id) await cloudinary.uploader.destroy(img.public_id);
+      }
+
+      const newImages = [];
+      for (let file of req.files) {
+        const uploaded = await uploadToCloudinary(file.buffer, "meesho/products");
+        newImages.push(uploaded);
+      }
+      req.body.images = newImages;
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+
+    res.json({ success: true, data: updatedProduct });
+
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 export const getAllProducts = async (req, res) => {
   try {
