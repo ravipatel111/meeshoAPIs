@@ -5,13 +5,13 @@ import {
   getUserDetails,
   blockUser,
   unblockUser,
-  getAllSellers,
-  getPendingSellers,
-  getSellerDetails,
-  approveSeller,
-  rejectSeller,
-  blockSeller,
-  unblockSeller,
+  // getAllSellers,
+  // getPendingSellers,
+  // getSellerDetails,
+  // approveSeller,
+  // rejectSeller,
+  // blockSeller,
+  // unblockSeller,
 } from "../../controllers/admin/admin.js";
 
 import {
@@ -26,7 +26,7 @@ import {
   rejectProduct,
   getAllProducts,
   deleteProductByAdmin,
-  getProductsBySeller,
+  // getProductsBySeller,
 } from "../../controllers/products/adminProductControllers.js";
 
 import { auth, isAdmin } from "../../middleware/authMiddleware.js";
@@ -39,18 +39,18 @@ router.get("/admin/user/:id", auth, isAdmin, getUserDetails);
 router.patch("/admin/user/block/:id", auth, isAdmin, blockUser);
 router.patch("/admin/user/unblock/:id", auth, isAdmin, unblockUser);
 
-// Fix: admin seller management routes — were all commented out
-router.get("/admin/sellers", auth, isAdmin, getAllSellers);
-router.get("/admin/sellers/pending", auth, isAdmin, getPendingSellers);
-router.get("/admin/seller/:id", auth, isAdmin, getSellerDetails);
-router.patch("/admin/seller/approve/:id", auth, isAdmin, approveSeller);
-router.patch("/admin/seller/reject/:id", auth, isAdmin, rejectSeller);
-router.patch("/admin/seller/block/:id", auth, isAdmin, blockSeller);
-router.patch("/admin/seller/unblock/:id", auth, isAdmin, unblockSeller);
+// Seller management routes are disabled for this project
+// router.get("/admin/sellers", auth, isAdmin, getAllSellers);
+// router.get("/admin/sellers/pending", auth, isAdmin, getPendingSellers);
+// router.get("/admin/seller/:id", auth, isAdmin, getSellerDetails);
+// router.patch("/admin/seller/approve/:id", auth, isAdmin, approveSeller);
+// router.patch("/admin/seller/reject/:id", auth, isAdmin, rejectSeller);
+// router.patch("/admin/seller/block/:id", auth, isAdmin, blockSeller);
+// router.patch("/admin/seller/unblock/:id", auth, isAdmin, unblockSeller);
 
 // admin product management
 router.get("/admin/getall/products", auth, isAdmin, getAllProducts);
-router.get("/admin/seller/:sellerId/products", auth, isAdmin, getProductsBySeller);
+// router.get("/admin/seller/:sellerId/products", auth, isAdmin, getProductsBySeller);
 router.put("/admin/product/approve/:id", auth, isAdmin, approveProduct);
 router.put("/admin/product/reject/:id", auth, isAdmin, rejectProduct);
 router.delete("/admin/product/delete/:id", auth, isAdmin, deleteProductByAdmin);

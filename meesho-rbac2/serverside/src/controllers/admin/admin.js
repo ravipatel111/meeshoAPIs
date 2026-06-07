@@ -2,7 +2,7 @@ import User from "../../models/userModel.js";
 import Order from "../../models/orderModel.js";
 import Cart from "../../models/cartModels.js";
 import Wishlist from "../../models/wishlistModel.js";
-import Seller from "../../models/vendorModel.js";
+// import Seller from "../../models/vendorModel.js"; // seller management disabled
 import Product from "../../models/productModels.js";
 
 export const getAllUsers = async (req, res) => {
@@ -64,6 +64,7 @@ export const unblockUser = async (req, res) => {
   }
 };
 
+/* Seller management functions are disabled for admin-user only mode
 export const getAllSellers = async (req, res) => {
   try {
     const sellers = await Seller.find().select("-password");
@@ -72,6 +73,90 @@ export const getAllSellers = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// Fix: filter by both isApproved:false AND isVerified:true — exclude unverified registrations
+export const getPendingSellers = async (req, res) => {
+  try {
+    const sellers = await Seller.find({ isApproved: false, isVerified: true }).select("-password");
+    res.json({ success: true, sellers });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getSellerDetails = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const seller = await Seller.findById(id).select("-password");
+    if (!seller) return res.status(404).json({ success: false, message: "Seller not found" });
+
+    const totalProducts = await Product.countDocuments({ seller: id });
+    const orders = await Order.find({ seller: id });
+    const totalOrders = orders.length;
+    const revenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
+
+    res.json({
+      success: true,
+      seller,
+      activity: { totalProducts, totalOrders, revenue },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const approveSeller = async (req, res) => {
+  try {
+    const seller = await Seller.findByIdAndUpdate(
+      req.params.id,
+      { isApproved: true, rejectionReason: "" },
+      { new: true }
+    ).select("-password");
+    if (!seller) return res.status(404).json({ success: false, message: "Seller not found" });
+    res.json({ success: true, message: "Seller approved", seller });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const rejectSeller = async (req, res) => {
+  try {
+    const { reason } = req.body;
+    if (!reason) {
+      return res.status(400).json({ success: false, message: "reason is required" });
+    }
+    const seller = await Seller.findByIdAndUpdate(
+      req.params.id,
+      { isApproved: false, rejectionReason: reason },
+      { new: true }
+    ).select("-password");
+    if (!seller) return res.status(404).json({ success: false, message: "Seller not found" });
+    res.json({ success: true, message: "Seller rejected", seller });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const blockSeller = async (req, res) => {
+  try {
+    const seller = await Seller.findByIdAndUpdate(req.params.id, { isBlocked: true }, { new: true }).select("-password");
+    if (!seller) return res.status(404).json({ success: false, message: "Seller not found" });
+    res.json({ success: true, message: "Seller blocked", seller });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const unblockSeller = async (req, res) => {
+  try {
+    const seller = await Seller.findByIdAndUpdate(req.params.id, { isBlocked: false }, { new: true }).select("-password");
+    if (!seller) return res.status(404).json({ success: false, message: "Seller not found" });
+    res.json({ success: true, message: "Seller unblocked", seller });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+*/
 
 // Fix: filter by both isApproved:false AND isVerified:true — exclude unverified registrations
 export const getPendingSellers = async (req, res) => {

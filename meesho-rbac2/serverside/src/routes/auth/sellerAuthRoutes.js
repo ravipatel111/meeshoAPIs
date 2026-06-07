@@ -1,4 +1,7 @@
 import express from "express";
+
+// Seller auth routes disabled for admin-user only mode
+/*
 import {
   registerSeller,
   loginSeller,
@@ -29,5 +32,8 @@ router.post("/verify-email", validate(verifyEmailSchema), verifyEmailSeller);
 router.post("/reset-password", validate(resetPasswordSchema), resetSellerPassword);
 router.post("/change-password", auth, isSeller, validate(changePasswordSchema), changeSellerPassword);
 router.post("/logout", auth, isSeller, logoutSeller);
+*/
+
+const router = express.Router();
 
 export default router;

@@ -86,6 +86,7 @@ export const getAllProducts = async (req, res) => {
   }
 };
 
+/* Seller-specific product queries are disabled for admin-user only mode.
 // Admin: get all products filtered by a particular seller ID
 export const getProductsBySeller = async (req, res) => {
   try {
@@ -107,6 +108,7 @@ export const getProductsBySeller = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+*/
 
 export const approveProduct = async (req, res) => {
   try {
@@ -155,7 +157,7 @@ export const deleteProductByAdmin = async (req, res) => {
   }
 };
 
-// seller-facing functions used in sellerRouter
+/* seller-facing functions used in sellerRouter
 export const addProduct = async (req, res) => {
   try {
     const { title, price, category } = req.body;
@@ -236,26 +238,5 @@ export const updateStock = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+*/
 
-export const updatePrice = async (req, res) => {
-  try {
-    const { price } = req.body;
-
-    if (!price) {
-      return res.status(400).json({ success: false, message: "price is required" });
-    }
-
-    const product = await Product.findOneAndUpdate(
-      { _id: req.params.id, seller: req.user.userId },
-      { price },
-      { new: true }
-    );
-
-    if (!product) return res.status(404).json({ success: false, message: "Product not found" });
-
-    res.json({ success: true, product });
-
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};

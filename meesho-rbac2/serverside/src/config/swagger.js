@@ -1184,7 +1184,7 @@ export const swaggerDocument = {
         }
       }
     },
-    "/admin/seller/{sellerId}/payments": {
+    /* "/admin/seller/{sellerId}/payments": {
       get: {
         tags: ["Admin Payments"],
         summary: "Get seller specific payments list",
@@ -1201,7 +1201,7 @@ export const swaggerDocument = {
           200: { description: "Success" }
         }
       }
-    },
+    }, */
     "/refund/request": {
       post: {
         tags: ["Refunds"],

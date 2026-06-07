@@ -3,7 +3,7 @@ import express from "express";
 import {
   createPayment,
   getUserPayments,
-  getSellerPaymentsById,
+  // getSellerPaymentsById,
 } from "../../controllers/paymentController/paymentController.js";
 
 import {
@@ -24,6 +24,6 @@ router.get("/payment/my", auth, isUser, getUserPayments);
 router.get("/admin/payments", auth, isAdmin, getAllPayments);
 router.put("/admin/payment/update/:id", auth, isAdmin, updatePaymentStatus);
 router.get("/admin/revenue", auth, isAdmin, getRevenue);
-router.get("/admin/seller/:sellerId/payments", auth, isAdmin, getSellerPaymentsById);
+// router.get("/admin/seller/:sellerId/payments", auth, isAdmin, getSellerPaymentsById);
 
 export default router;

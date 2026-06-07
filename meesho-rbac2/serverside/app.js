@@ -11,14 +11,14 @@ import productRoutes from "./src/routes/products/productsRoutes.js";
 import cartRoutes from "./src/routes/cart/cartRoutes.js";
 import addressRoutes from "./src/routes/address/userAddressRouter.js";
 import orderRoutes from "./src/routes/order/orderRoutes.js";
-import sellerRoutes from "./src/routes/seller/sellerRouter.js"; // seller routes commented out inside
-import sellerDashboardRoutes from "./src/routes/seller/sellerDashboard.js"; // seller routes commented out inside
+// import sellerRoutes from "./src/routes/seller/sellerRouter.js"; // seller routes disabled
+// import sellerDashboardRoutes from "./src/routes/seller/sellerDashboard.js"; // seller routes disabled
 import adminRoutes from "./src/routes/admin/adminRoutes.js";
 import paymentRoutes from "./src/routes/payment/paymentRoutes.js";
 import refundRoutes from "./src/routes/refund/refundRoutes.js";
 import wishlistRoutes from "./src/routes/wishlist/wishlistRoutes.js";
 import userProfileRoutes from "./src/routes/user/userProfileRoutes.js";
-import sellerProfileRoutes from "./src/routes/sellerProfile/sellerProfileRoutes.js"; // seller routes commented out inside
+// import sellerProfileRoutes from "./src/routes/sellerProfile/sellerProfileRoutes.js"; // seller routes disabled
 import errorHandler from "./src/middleware/errorHandler.js";
 import swaggerUi from "swagger-ui-express";
 import { swaggerDocument } from "./src/config/swagger.js";
@@ -177,14 +177,14 @@ app.use("/api", productRoutes);       // public + admin (seller block commented)
 app.use("/api", cartRoutes);          // user only
 app.use("/api", addressRoutes);       // user only
 app.use("/api", orderRoutes);         // user + admin
-app.use("/api", sellerRoutes);        // all commented out
-app.use("/api", sellerDashboardRoutes); // all commented out
+// app.use("/api", sellerRoutes);        // seller routes disabled
+// app.use("/api", sellerDashboardRoutes); // seller routes disabled
 app.use("/api", adminRoutes);         // admin only
 app.use("/api", paymentRoutes);       // user + admin
 app.use("/api", refundRoutes);        // user + admin (seller block commented)
 app.use("/api", wishlistRoutes);      // user only
 app.use("/api", userProfileRoutes);   // user only
-app.use("/api", sellerProfileRoutes); // all commented out
+// app.use("/api", sellerProfileRoutes); // seller profile routes disabled
 
 // Global error handler — must be last
 app.use(errorHandler);

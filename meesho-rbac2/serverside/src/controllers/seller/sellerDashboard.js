@@ -1,3 +1,5 @@
+// Seller dashboard controller logic is disabled for admin-user only mode.
+/*
 import Order from "../../models/orderModel.js";
 import Product from "../../models/productModels.js";
 import Payment from "../../models/paymentModel.js";
@@ -66,3 +68,4 @@ export const getSellerEarnings = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+*/

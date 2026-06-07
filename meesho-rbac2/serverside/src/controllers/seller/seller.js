@@ -1,3 +1,7 @@
+// Seller controller logic is disabled for admin-user only mode.
+// The seller routes and APIs have been removed from the active application.
+
+/*
 import Product from "../../models/productModels.js";
 import Order from "../../models/orderModel.js";
 import Payment from "../../models/paymentModel.js";
@@ -125,3 +129,4 @@ export const getSellerEarnings = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+*/

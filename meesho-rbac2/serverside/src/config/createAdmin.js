@@ -3,14 +3,14 @@ import bcrypt from "bcrypt";
 
 const createAdmin = async () => {
   try {
-    const admin = await Admin.findOne({ email: "admin@12345gmail.com" });
+    const admin = await Admin.findOne({ email: "admin@123gmail.com" });
 
     if (!admin) {
-      const hashedPassword = await bcrypt.hash("admin@123", 10);
+      const hashedPassword = await bcrypt.hash("admin12345", 10);
 
       await Admin.create({
         name: "SuperAdmin",
-        email: "admin@12345gmail.com",
+        email: "admin@123gmail.com",
         password: hashedPassword,
       });
 

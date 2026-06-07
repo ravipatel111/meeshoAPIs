@@ -46,6 +46,7 @@ export const getUserPayments = async (req, res) => {
   }
 };
 
+/* Seller-specific admin payment query disabled for admin-user only mode
 // Admin: get all payments of a particular seller by sellerId
 export const getSellerPaymentsById = async (req, res) => {
   try {
@@ -77,3 +78,4 @@ export const getSellerPaymentsById = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+*/

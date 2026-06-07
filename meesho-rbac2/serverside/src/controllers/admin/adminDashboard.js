@@ -1,6 +1,6 @@
 import User from "../../models/userModel.js";
 import Order from "../../models/orderModel.js";
-import Seller from "../../models/vendorModel.js";
+// import Seller from "../../models/vendorModel.js"; // seller metrics disabled
 import Product from "../../models/productModels.js";
 import Payment from "../../models/paymentModel.js";
 import Refund from "../../models/refundModel.js";
@@ -11,7 +11,7 @@ import Refund from "../../models/refundModel.js";
 export const getAdminDashboard = async (req, res) => {
   try {
     const totalUsers = await User.countDocuments();
-    const totalSellers = await Seller.countDocuments();
+    // const totalSellers = await Seller.countDocuments();
     const totalOrders = await Order.countDocuments();
     const totalProducts = await Product.countDocuments();
 
@@ -33,7 +33,7 @@ export const getAdminDashboard = async (req, res) => {
       success: true,
       dashboard: {
         totalUsers,
-        totalSellers,
+        // totalSellers,
         totalOrders,
         totalProducts,
         totalRevenue: totalRevenue[0]?.total || 0,
@@ -82,11 +82,11 @@ export const getRevenueAnalytics = async (req, res) => {
 export const getPlatformStats = async (req, res) => {
   try {
     const users = await User.countDocuments();
-    const sellers = await Seller.countDocuments();
+    // const sellers = await Seller.countDocuments();
     const products = await Product.countDocuments();
     const orders = await Order.countDocuments();
 
-    res.json({ success: true, stats: { users, sellers, products, orders } , message : "dashboard statistics"});
+    res.json({ success: true, stats: { users, /* sellers, */ products, orders } , message : "dashboard statistics"});
 
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
