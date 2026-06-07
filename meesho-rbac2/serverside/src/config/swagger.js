@@ -1401,6 +1401,424 @@ export const swaggerDocument = {
           200: { description: "Profile updated successfully" }
         }
       }
+    },
+    "/admin/users": {
+      get: {
+        tags: ["Admin Users"],
+        summary: "Get all users",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: "Success",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean" },
+                    count: { type: "number" },
+                    users: {
+                      type: "array",
+                      items: { $ref: "#/components/schemas/User" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          401: { description: "Unauthorized" },
+          403: { description: "Forbidden - Admin access required" },
+          500: { description: "Server Error" }
+        }
+      }
+    },
+    "/admin/user/{id}": {
+      get: {
+        tags: ["Admin Users"],
+        summary: "Get user details by ID",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" }
+          }
+        ],
+        responses: {
+          200: {
+            description: "Success",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean" },
+                    user: { $ref: "#/components/schemas/User" },
+                    behavior: {
+                      type: "object",
+                      properties: {
+                        totalOrders: { type: "number" },
+                        totalSpent: { type: "number" },
+                        cancelledOrders: { type: "number" },
+                        cartItems: { type: "number" },
+                        wishlistItems: { type: "number" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          404: { description: "User not found" },
+          401: { description: "Unauthorized" },
+          403: { description: "Forbidden" },
+          500: { description: "Server Error" }
+        }
+      }
+    },
+    "/admin/user/block/{id}": {
+      patch: {
+        tags: ["Admin Users"],
+        summary: "Block a user",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" }
+          }
+        ],
+        responses: {
+          200: {
+            description: "User blocked successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean" },
+                    message: { type: "string", example: "User blocked" },
+                    user: { $ref: "#/components/schemas/User" }
+                  }
+                }
+              }
+            }
+          },
+          404: { description: "User not found" },
+          401: { description: "Unauthorized" },
+          403: { description: "Forbidden" },
+          500: { description: "Server Error" }
+        }
+      }
+    },
+    "/admin/user/unblock/{id}": {
+      patch: {
+        tags: ["Admin Users"],
+        summary: "Unblock a user",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" }
+          }
+        ],
+        responses: {
+          200: {
+            description: "User unblocked successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean" },
+                    message: { type: "string", example: "User unblocked" },
+                    user: { $ref: "#/components/schemas/User" }
+                  }
+                }
+              }
+            }
+          },
+          404: { description: "User not found" },
+          401: { description: "Unauthorized" },
+          403: { description: "Forbidden" },
+          500: { description: "Server Error" }
+        }
+      }
+    },
+    "/admin/getall/products": {
+      get: {
+        tags: ["Admin Product"],
+        summary: "Get all products for admin with details",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: "Success",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean" },
+                    products: {
+                      type: "array",
+                      items: { $ref: "#/components/schemas/Product" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          401: { description: "Unauthorized" },
+          403: { description: "Forbidden" },
+          500: { description: "Server Error" }
+        }
+      }
+    },
+    "/admin/product/approve/{id}": {
+      put: {
+        tags: ["Admin Product"],
+        summary: "Approve a product",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" }
+          }
+        ],
+        responses: {
+          200: {
+            description: "Product approved successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean" },
+                    product: { $ref: "#/components/schemas/Product" }
+                  }
+                }
+              }
+            }
+          },
+          404: { description: "Product not found" },
+          401: { description: "Unauthorized" },
+          403: { description: "Forbidden" },
+          500: { description: "Server Error" }
+        }
+      }
+    },
+    "/admin/product/reject/{id}": {
+      put: {
+        tags: ["Admin Product"],
+        summary: "Reject a product",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" }
+          }
+        ],
+        responses: {
+          200: {
+            description: "Product rejected successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean" },
+                    product: { $ref: "#/components/schemas/Product" }
+                  }
+                }
+              }
+            }
+          },
+          404: { description: "Product not found" },
+          401: { description: "Unauthorized" },
+          403: { description: "Forbidden" },
+          500: { description: "Server Error" }
+        }
+      }
+    },
+    "/admin/product/delete/{id}": {
+      delete: {
+        tags: ["Admin Product"],
+        summary: "Delete a product by admin",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" }
+          }
+        ],
+        responses: {
+          200: {
+            description: "Product deleted successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean" },
+                    message: { type: "string", example: "Product deleted" }
+                  }
+                }
+              }
+            }
+          },
+          404: { description: "Product not found" },
+          401: { description: "Unauthorized" },
+          403: { description: "Forbidden" },
+          500: { description: "Server Error" }
+        }
+      }
+    },
+    "/admin/dashboard": {
+      get: {
+        tags: ["Admin Dashboard"],
+        summary: "Get admin dashboard overview metrics",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: "Success",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean" },
+                    dashboard: {
+                      type: "object",
+                      properties: {
+                        totalUsers: { type: "number" },
+                        totalOrders: { type: "number" },
+                        totalProducts: { type: "number" },
+                        totalRevenue: { type: "number" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          401: { description: "Unauthorized" },
+          403: { description: "Forbidden" },
+          500: { description: "Server Error" }
+        }
+      }
+    },
+    "/admin/dashboard/orders": {
+      get: {
+        tags: ["Admin Dashboard"],
+        summary: "Get order status breakdown statistics",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: "Success",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean" },
+                    orders: {
+                      type: "object",
+                      properties: {
+                        pending: { type: "number" },
+                        shipped: { type: "number" },
+                        delivered: { type: "number" },
+                        cancelled: { type: "number" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          401: { description: "Unauthorized" },
+          403: { description: "Forbidden" },
+          500: { description: "Server Error" }
+        }
+      }
+    },
+    "/admin/dashboard/revenue": {
+      get: {
+        tags: ["Admin Dashboard"],
+        summary: "Get monthly revenue analytics data",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: "Success",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean" },
+                    revenue: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          _id: { type: "number", description: "Month number (1-12)" },
+                          total: { type: "number" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          401: { description: "Unauthorized" },
+          403: { description: "Forbidden" },
+          500: { description: "Server Error" }
+        }
+      }
+    },
+    "/admin/dashboard/stats": {
+      get: {
+        tags: ["Admin Dashboard"],
+        summary: "Get general platform metrics overview",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: "Success",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean" },
+                    message: { type: "string", example: "dashboard statistics" },
+                    stats: {
+                      type: "object",
+                      properties: {
+                        users: { type: "number" },
+                        products: { type: "number" },
+                        orders: { type: "number" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          401: { description: "Unauthorized" },
+          403: { description: "Forbidden" },
+          500: { description: "Server Error" }
+        }
+      }
     }
   }
 };
