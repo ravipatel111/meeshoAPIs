@@ -145,15 +145,21 @@ export const swaggerDocument = {
         requestBody: {
           required: true,
           content: {
-            "application/json": {
+            "multipart/form-data": {
               schema: {
                 type: "object",
-                required: ["email", "mobile", "password", "username"],
+                required: ["email", "mobile", "password", "username", "confirmpassword"],
                 properties: {
                   username: { type: "string" },
                   email: { type: "string" },
                   mobile: { type: "string" },
-                  password: { type: "string" }
+                  password: { type: "string" },
+                  confirmpassword: { type: "string" },
+                  profileImage: {
+                    type: "string",
+                    format: "binary",
+                    description: "User profile picture"
+                  }
                 }
               }
             }
@@ -368,13 +374,18 @@ export const swaggerDocument = {
         requestBody: {
           required: true,
           content: {
-            "application/json": {
+            "multipart/form-data": {
               schema: {
                 type: "object",
-                required: ["name", "description"],
+                required: ["name", "slug"],
                 properties: {
                   name: { type: "string" },
-                  description: { type: "string" }
+                  slug: { type: "string" },
+                  profileImage: {
+                    type: "string",
+                    format: "binary",
+                    description: "Category image file"
+                  }
                 }
               }
             }
@@ -410,12 +421,17 @@ export const swaggerDocument = {
         ],
         requestBody: {
           content: {
-            "application/json": {
+            "multipart/form-data": {
               schema: {
                 type: "object",
                 properties: {
                   name: { type: "string" },
-                  description: { type: "string" }
+                  slug: { type: "string" },
+                  profileImage: {
+                    type: "string",
+                    format: "binary",
+                    description: "New category image file"
+                  }
                 }
               }
             }
@@ -452,13 +468,19 @@ export const swaggerDocument = {
         requestBody: {
           required: true,
           content: {
-            "application/json": {
+            "multipart/form-data": {
               schema: {
                 type: "object",
-                required: ["name", "category"],
+                required: ["name", "slug", "category"],
                 properties: {
                   name: { type: "string" },
-                  category: { type: "string", description: "Parent category ID" }
+                  slug: { type: "string" },
+                  category: { type: "string", description: "Parent category ID" },
+                  profileImage: {
+                    type: "string",
+                    format: "binary",
+                    description: "Subcategory image file"
+                  }
                 }
               }
             }
@@ -494,11 +516,18 @@ export const swaggerDocument = {
         ],
         requestBody: {
           content: {
-            "application/json": {
+            "multipart/form-data": {
               schema: {
                 type: "object",
                 properties: {
-                  name: { type: "string" }
+                  name: { type: "string" },
+                  slug: { type: "string" },
+                  category: { type: "string", description: "Parent category ID" },
+                  profileImage: {
+                    type: "string",
+                    format: "binary",
+                    description: "New subcategory image file"
+                  }
                 }
               }
             }
@@ -605,10 +634,10 @@ export const swaggerDocument = {
         requestBody: {
           required: true,
           content: {
-            "application/json": {
+            "multipart/form-data": {
               schema: {
                 type: "object",
-                required: ["title", "price", "category", "subCategory", "seller"],
+                required: ["title", "price", "category", "seller"],
                 properties: {
                   title: { type: "string" },
                   description: { type: "string" },
@@ -617,7 +646,15 @@ export const swaggerDocument = {
                   category: { type: "string" },
                   subCategory: { type: "string" },
                   seller: { type: "string" },
-                  stock: { type: "number" }
+                  stock: { type: "number" },
+                  images: {
+                    type: "array",
+                    items: {
+                      type: "string",
+                      format: "binary"
+                    },
+                    description: "Product image files (up to 5)"
+                  }
                 }
               }
             }
@@ -653,7 +690,7 @@ export const swaggerDocument = {
         ],
         requestBody: {
           content: {
-            "application/json": {
+            "multipart/form-data": {
               schema: {
                 type: "object",
                 properties: {
@@ -661,7 +698,17 @@ export const swaggerDocument = {
                   description: { type: "string" },
                   price: { type: "number" },
                   discountPrice: { type: "number" },
-                  stock: { type: "number" }
+                  category: { type: "string" },
+                  subCategory: { type: "string" },
+                  stock: { type: "number" },
+                  images: {
+                    type: "array",
+                    items: {
+                      type: "string",
+                      format: "binary"
+                    },
+                    description: "New product image files (up to 5)"
+                  }
                 }
               }
             }
@@ -1386,12 +1433,17 @@ export const swaggerDocument = {
         requestBody: {
           required: true,
           content: {
-            "application/json": {
+            "multipart/form-data": {
               schema: {
                 type: "object",
                 properties: {
                   username: { type: "string" },
-                  phoneNumber: { type: "string" }
+                  mobile: { type: "string" },
+                  profileImage: {
+                    type: "string",
+                    format: "binary",
+                    description: "New profile picture file"
+                  }
                 }
               }
             }
