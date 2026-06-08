@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import Admin from "../../models/adminModel.js";
 
 export const loginAdmin = async (req, res) => {
   try {
@@ -9,22 +10,31 @@ export const loginAdmin = async (req, res) => {
       return res.status(400).json({ success: false, message: "Email and password required" });
     }
 
-    if (email !== process.env.ADMIN_EMAIL) {
-      return res.status(400).json({ success: false, message: "Invalid credentials" });
+    const admin = await Admin.findOne({ email });
+    let passwordHash = admin?.password;
+
+    if (!admin) {
+      if (email !== process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD_HASH) {
+        return res.status(400).json({ success: false, message: "Invalid credentials" });
+      }
+      passwordHash = process.env.ADMIN_PASSWORD_HASH;
     }
 
-    // Fix: use bcrypt.compare instead of plain string comparison
-    const match = await bcrypt.compare(password, process.env.ADMIN_PASSWORD_HASH);
-
+    const match = await bcrypt.compare(password, passwordHash);
     if (!match) {
       return res.status(400).json({ success: false, message: "Invalid credentials" });
     }
 
-    const token = jwt.sign(
-      { role: "admin", email: process.env.ADMIN_EMAIL },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
+    const tokenPayload = {
+      role: "admin",
+      email,
+    };
+
+    if (admin) {
+      tokenPayload.adminId = admin._id;
+    }
+
+    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: "1d" });
 
     res.cookie("token", token, {
       httpOnly: true,

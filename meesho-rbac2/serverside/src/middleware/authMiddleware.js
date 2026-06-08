@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
+import Admin from "../models/adminModel.js";
 // import Seller from "../models/vendorModel.js"; // seller role removed for now
 
 export const auth = async (req, res, next) => {
@@ -25,8 +26,10 @@ export const auth = async (req, res, next) => {
     // }
 
     if (decoded.role === "admin") {
-      // admin is stored in env, not DB
-      account = { isBlocked: false };
+      const adminQuery = decoded.adminId
+        ? Admin.findById(decoded.adminId)
+        : Admin.findOne({ email: decoded.email });
+      account = await adminQuery;
     }
 
     if (!account) {

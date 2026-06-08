@@ -19,6 +19,7 @@ import refundRoutes from "./src/routes/refund/refundRoutes.js";
 import wishlistRoutes from "./src/routes/wishlist/wishlistRoutes.js";
 import userProfileRoutes from "./src/routes/user/userProfileRoutes.js";
 // import sellerProfileRoutes from "./src/routes/sellerProfile/sellerProfileRoutes.js"; // seller routes disabled
+import createAdmin from "./src/config/createAdmin.js";
 import errorHandler from "./src/middleware/errorHandler.js";
 import swaggerUi from "swagger-ui-express";
 import { swaggerDocument } from "./src/config/swagger.js";
@@ -188,6 +189,9 @@ app.use("/api", userProfileRoutes);   // user only
 
 // Global error handler — must be last
 app.use(errorHandler);
+
+// seed admin user on startup
+createAdmin();
 
 app.listen(port, () => {
   console.log("server is running...", port);

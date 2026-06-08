@@ -15,6 +15,11 @@ const adminSchema = new mongoose.Schema(
       type: String,
       default: "Admin",
     },
+
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
