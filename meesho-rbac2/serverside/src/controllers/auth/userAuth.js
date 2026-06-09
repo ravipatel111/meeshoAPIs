@@ -191,15 +191,16 @@ export const verifyEmailUser = async (req, res) => {
         .json({ success: false, message: "User not found" });
     }
 
-    const token = crypto.randomBytes(32).toString("hex");
+    const token = getotp();
     user.resetToken = token;
     user.resetTokenExpiry = Date.now() + 10 * 60 * 1000;
     await user.save();
 
+    // await sendResetEmail({ to: email, name: user.username, token });
+
     res.status(200).json({
       success: true,
-      token,
-      message: "Password reset token generated successfully",
+      Token : token ,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
