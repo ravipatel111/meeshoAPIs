@@ -14,10 +14,10 @@ export const userRegisterSchema = Joi.object({
   }),
 
   mobile: Joi.string()
-    .pattern(/^[6-9]\d{9}$/)
+    .pattern(/^\d{10}$/)
     .required()
     .messages({
-      "string.pattern.base": "Mobile must be a valid 10-digit Indian number",
+      "string.pattern.base": "Mobile number must be 10 digits",
       "any.required": "Mobile is required",
     }),
 
@@ -31,6 +31,8 @@ export const userRegisterSchema = Joi.object({
     "any.only": "Passwords do not match",
     "any.required": "Confirm password is required",
   }),
+
+  profileImage: Joi.any().optional(),
 });
 
 // USER LOGIN

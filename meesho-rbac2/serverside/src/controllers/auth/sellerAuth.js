@@ -5,6 +5,7 @@ import crypto from "crypto";
 import getotp from "../../utils/otp.js";
 import uploadToCloudinary from "../../utils/uploadToCloudinary.js";
 import sendResetEmail from "../../utils/sendResetEmail.js";
+import { cookieOptions, clearCookieOptions } from "../../config/cookieConfig.js";
 
 export const registerSeller = async (req, res) => {
   try {
@@ -126,7 +127,7 @@ export const loginSeller = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    res.cookie("token", token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+    res.cookie("token", token, cookieOptions);
 
     res.status(200).json({ success: true, token, message: "Seller login successful" });
 
@@ -224,6 +225,6 @@ export const changeSellerPassword = async (req, res) => {
 };
 
 export const logoutSeller = async (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie("token", clearCookieOptions);
   res.json({ success: true, message: "Seller logged out" });
 };

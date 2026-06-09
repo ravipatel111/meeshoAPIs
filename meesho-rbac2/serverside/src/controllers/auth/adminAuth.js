@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import Admin from "../../models/adminModel.js";
+import { cookieOptions, clearCookieOptions } from "../../config/cookieConfig.js";
 
 export const loginAdmin = async (req, res) => {
   try {
@@ -36,10 +37,7 @@ export const loginAdmin = async (req, res) => {
 
     const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: "1d" });
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000,
-    });
+    res.cookie("token", token, cookieOptions);
 
     res.json({ success: true, token, message: "Admin login success" });
 
@@ -49,6 +47,6 @@ export const loginAdmin = async (req, res) => {
 };
 
 export const logoutAdmin = async (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie("token", clearCookieOptions);
   res.json({ success: true, message: "Admin logout success" });
 };
