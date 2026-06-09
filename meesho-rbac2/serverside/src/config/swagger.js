@@ -166,7 +166,22 @@ export const swaggerDocument = {
           }
         },
         responses: {
-          201: { description: "User registered successfully" },
+          201: {
+            description: "User registered successfully. OTP returned in response.",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean" },
+                    data: { type: "string", description: "User ID" },
+                    otp: { type: "string", description: "Generated verification OTP" },
+                    message: { type: "string" }
+                  }
+                }
+              }
+            }
+          },
           400: { description: "Invalid input or user already exists" }
         }
       }
@@ -206,10 +221,11 @@ export const swaggerDocument = {
             "application/json": {
               schema: {
                 type: "object",
-                required: ["email", "otp"],
+                required: ["otp"],
                 properties: {
-                  email: { type: "string" },
-                  otp: { type: "string" }
+                  userId: { type: "string", description: "User ID (either email or userId is required)" },
+                  email: { type: "string", description: "User email address (either email or userId is required)" },
+                  otp: { type: "string", description: "Verification OTP" }
                 }
               }
             }

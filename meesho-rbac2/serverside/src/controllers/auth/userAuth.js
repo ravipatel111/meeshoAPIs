@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import getotp from "../../utils/otp.js";
 import uploadToCloudinary from "../../utils/uploadToCloudinary.js";
-import sendOtpEmail from "../../utils/sendEmail.js";
 import sendResetEmail from "../../utils/sendResetEmail.js";
 
 export const registerUser = async (req, res) => {
@@ -43,12 +42,11 @@ export const registerUser = async (req, res) => {
       otpExpiresAt: Date.now() + 5 * 60 * 1000,
     });
 
-    await sendOtpEmail({ to: email, name: username, otp });
-
     res.status(201).json({
       success: true,
       data: user._id,
-      message: "User registered. OTP sent to your email.",
+      otp,
+      message: "User registered successfully.",
     });
 
   } catch (error) {
@@ -58,17 +56,24 @@ export const registerUser = async (req, res) => {
 
 export const verifyUserOtp = async (req, res) => {
   try {
-    const { userId, otp } = req.body;
+    const { userId, email, otp } = req.body;
 
-    if (!userId || !otp) {
-      return res.status(400).json({ success: false, message: "userId and otp are required" });
+    if ((!userId && !email) || !otp) {
+      return res.status(400).json({ success: false, message: "userId or email, and otp are required" });
     }
 
-    const user = await User.findOne({
-      _id: userId,
+    const query = {
       otp: otp,
       otpExpiresAt: { $gt: Date.now() },
-    });
+    };
+
+    if (userId) {
+      query._id = userId;
+    } else {
+      query.email = email;
+    }
+
+    const user = await User.findOne(query);
 
     if (!user) {
       return res.status(400).json({ success: false, message: "Invalid or expired OTP" });

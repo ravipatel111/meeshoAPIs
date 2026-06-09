@@ -47,29 +47,25 @@ export const loginSchema = Joi.object({
 
 // VERIFY OTP (USER)
 export const verifyUserOtpSchema = Joi.object({
-  userId: Joi.string().required().messages({
-    "any.required": "userId is required",
-  }),
-
+  userId: Joi.string().optional(),
+  email: Joi.string().email().optional(),
   otp: Joi.string().length(6).pattern(/^\d+$/).required().messages({
     "string.length": "OTP must be exactly 6 digits",
     "string.pattern.base": "OTP must contain only numbers",
     "any.required": "OTP is required",
   }),
-});
+}).or("userId", "email");
 
 // VERIFY OTP (SELLER)
 export const verifySellerOtpSchema = Joi.object({
-  sellerId: Joi.string().required().messages({
-    "any.required": "sellerId is required",
-  }),
-
+  sellerId: Joi.string().optional(),
+  email: Joi.string().email().optional(),
   otp: Joi.string().length(6).pattern(/^\d+$/).required().messages({
     "string.length": "OTP must be exactly 6 digits",
     "string.pattern.base": "OTP must contain only numbers",
     "any.required": "OTP is required",
   }),
-});
+}).or("sellerId", "email");
 
 // VERIFY EMAIL (forgot password)
 export const verifyEmailSchema = Joi.object({

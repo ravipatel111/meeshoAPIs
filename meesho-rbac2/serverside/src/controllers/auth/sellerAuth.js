@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import getotp from "../../utils/otp.js";
 import uploadToCloudinary from "../../utils/uploadToCloudinary.js";
-import sendOtpEmail from "../../utils/sendEmail.js";
 import sendResetEmail from "../../utils/sendResetEmail.js";
 
 export const registerSeller = async (req, res) => {
@@ -44,12 +43,11 @@ export const registerSeller = async (req, res) => {
       otpExpiresAt: Date.now() + 5 * 60 * 1000,
     });
 
-    await sendOtpEmail({ to: email, name: ownerName, otp });
-
     res.status(201).json({
       success: true,
       data: seller._id,
-      message: "Seller registered. OTP sent to your email.",
+      otp,
+      message: "Seller registered successfully.",
     });
 
   } catch (error) {
@@ -59,19 +57,26 @@ export const registerSeller = async (req, res) => {
 
 export const verifySellerOtp = async (req, res) => {
   try {
-    const { sellerId, otp } = req.body;
+    const { sellerId, email, otp } = req.body;
 
-    if (!sellerId || !otp) {
-      return res.status(400).json({ success: false, message: "sellerId and otp are required" });
+    if ((!sellerId && !email) || !otp) {
+      return res.status(400).json({ success: false, message: "sellerId or email, and otp are required" });
     }
 
-    const seller = await Seller.findById(sellerId);
+    const query = {
+      otp: otp,
+      otpExpiresAt: { $gt: Date.now() },
+    };
+
+    if (sellerId) {
+      query._id = sellerId;
+    } else {
+      query.email = email;
+    }
+
+    const seller = await Seller.findOne(query);
 
     if (!seller) {
-      return res.status(404).json({ success: false, message: "Seller not found" });
-    }
-
-    if (seller.otp !== otp || seller.otpExpiresAt < Date.now()) {
       return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
     }
 
