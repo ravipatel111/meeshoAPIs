@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import getotp from "../../utils/otp.js";
 import uploadToCloudinary from "../../utils/uploadToCloudinary.js";
-import sendResetEmail from "../../utils/sendResetEmail.js";
 import {
   cookieOptions,
   clearCookieOptions,
@@ -197,11 +196,10 @@ export const verifyEmailUser = async (req, res) => {
     user.resetTokenExpiry = Date.now() + 10 * 60 * 1000;
     await user.save();
 
-    await sendResetEmail({ to: email, name: user.username, token });
-
     res.status(200).json({
       success: true,
-      message: "Password reset link sent to your email",
+      token,
+      message: "Password reset token generated successfully",
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
