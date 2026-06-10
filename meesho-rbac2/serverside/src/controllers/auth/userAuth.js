@@ -172,38 +172,71 @@ export const loginUser = async (req, res) => {
   }
 };
 
-// Fix: send reset token via email instead of returning it in response
+// export const verifyEmailUser = async (req, res) => {
+//   try {
+//     const { email } = req.body;
+
+//     if (!email) {
+//       return res
+//         .status(400)
+//         .json({ success: false, message: "Email required" });
+//     }
+
+//     const user = await User.findOne({ email });
+
+//     if (!user) {
+//       return res
+//         .status(404)
+//         .json({ success: false, message: "User not found" });
+//     }
+
+//     const token = crypto.randomBytes(32).toString("hex");
+//     user.resetToken = token;
+//     user.resetTokenExpiry = Date.now() + 10 * 60 * 1000;
+//     await user.save();
+
+//     // await sendResetEmail({ to: email, name: user.username, token });
+
+//     res.status(200).json({
+//       success: true,
+//       message: "Password reset link sent to your email",
+//       Token: token,
+//     });
+//   } catch (error) {
+//     res.status(500).json({ success: false, message: error.message });
+//   }
+// };
+
 export const verifyEmailUser = async (req, res) => {
   try {
     const { email } = req.body;
 
-    if (!email) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Email required" });
-    }
-
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
 
-    const token = getotp();
+    const token = crypto.randomBytes(32).toString("hex");
+
     user.resetToken = token;
     user.resetTokenExpiry = Date.now() + 10 * 60 * 1000;
-    await user.save();
 
-    // await sendResetEmail({ to: email, name: user.username, token });
+    await user.save();
 
     res.status(200).json({
       success: true,
-      Token : token ,
+      message: "Reset token generated",
+      resetToken: token,
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
