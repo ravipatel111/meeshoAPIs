@@ -23,7 +23,7 @@ const refundSchema = new mongoose.Schema(
   // Fix: added seller field so sellerRefund.initiateRefund can store it
   seller: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Seller",
+    ref: "Admin",
   },
 
   amount: {

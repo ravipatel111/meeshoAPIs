@@ -201,7 +201,7 @@ export const searchProducts = async (req, res) => {
 
     const products = await Product.find(query)
       .populate("category")
-      .populate("seller" , "name email storeName")
+      .populate("seller" , "name email")
       .sort(sortOption)
       .skip(skip)
       .limit(limitNum);

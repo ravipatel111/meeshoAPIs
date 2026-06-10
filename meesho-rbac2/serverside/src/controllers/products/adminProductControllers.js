@@ -6,8 +6,10 @@ export const createProductByAdmin = async (req, res) => {
   try {
     const { title, description, price, discountPrice, category, subCategory, stock, seller } = req.body;
 
-    if (!title || !price || !category || !seller) {
-      return res.status(400).json({ success: false, message: "title, price, category, and seller are required" });
+    const adminId = seller || req.user.adminId;
+
+    if (!title || !price || !category || !adminId) {
+      return res.status(400).json({ success: false, message: "title, price, category, and seller (admin) are required" });
     }
 
     let images = [];
@@ -27,7 +29,7 @@ export const createProductByAdmin = async (req, res) => {
       subCategory,
       images,
       stock,
-      seller,
+      seller: adminId,
       status: "approved", // admin products are automatically approved
     });
 
@@ -75,7 +77,7 @@ export const updateProductByAdmin = async (req, res) => {
 export const getAllProducts = async (req, res) => {
   try {
     const products = await Product.find()
-      .populate("seller", "storeName email")
+      .populate("seller", "name email")
       .populate("category", "name")
       .populate("subCategory", "name");
 

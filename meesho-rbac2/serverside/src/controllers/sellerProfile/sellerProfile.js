@@ -1,3 +1,4 @@
+/*
 import Seller from "../../models/vendorModel.js";
 import cloudinary from "../../config/cloudinary.js";
 import uploadToCloudinary from "../../utils/uploadToCloudinary.js";
@@ -53,3 +54,5 @@ export const updateSellerProfile = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+*/
+

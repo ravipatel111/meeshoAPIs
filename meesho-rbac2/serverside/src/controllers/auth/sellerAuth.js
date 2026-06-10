@@ -1,3 +1,4 @@
+/*
 import Seller from "../../models/vendorModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -228,3 +229,5 @@ export const logoutSeller = async (req, res) => {
   res.clearCookie("token", clearCookieOptions);
   res.json({ success: true, message: "Seller logged out" });
 };
+*/
+

@@ -10,7 +10,7 @@ const orderSchema = new mongoose.Schema(
 
   seller: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Seller",
+    ref: "Admin",
     required: true
   },
 

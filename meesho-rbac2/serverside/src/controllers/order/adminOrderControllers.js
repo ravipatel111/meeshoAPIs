@@ -6,7 +6,7 @@ export const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find()
       .populate("user", "username email mobile")
-      .populate("seller", "storeName email mobile")
+      .populate("seller", "name email")
       .populate("product", "title price images")
       .sort({ createdAt: -1 });
 
