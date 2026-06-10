@@ -72,3 +72,43 @@ export const logoutAdmin = async (req, res) => {
   res.clearCookie("token", clearCookieOptions);
   res.json({ success: true, message: "Admin logout success" });
 };
+
+export const changeAdminPassword = async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Old and new password required" });
+    }
+
+    const adminQuery = req.user.adminId
+      ? Admin.findById(req.user.adminId)
+      : Admin.findOne({ email: req.user.email });
+
+    const admin = await adminQuery;
+
+    if (!admin) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Admin not found" });
+    }
+
+    const match = await bcrypt.compare(oldPassword, admin.password);
+
+    if (!match) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Old password incorrect" });
+    }
+
+    admin.password = await bcrypt.hash(newPassword, 10);
+    await admin.save();
+
+    res.status(200).json({ success: true, message: "Password changed successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
