@@ -4,6 +4,7 @@ import Cart from "../../models/cartModels.js";
 import Wishlist from "../../models/wishlistModel.js";
 // import Seller from "../../models/vendorModel.js"; // seller management disabled
 import Product from "../../models/productModels.js";
+import Address from "../../models/addressModel.js";
 
 export const getAllUsers = async (req, res) => {
   try {
@@ -59,6 +60,37 @@ export const unblockUser = async (req, res) => {
     const user = await User.findByIdAndUpdate(req.params.id, { isBlocked: false }, { new: true }).select("-password");
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
     res.json({ success: true, message: "User unblocked", user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Delete related user documents: cart, wishlist, address
+    await Cart.findOneAndDelete({ user: id });
+    await Wishlist.findOneAndDelete({ user: id });
+    await Address.deleteMany({ user: id });
+
+    // Finally delete the user document
+    await User.findByIdAndDelete(id);
+
+    res.status(200).json({
+      success: true,
+      message: "User and associated cart, wishlist, and addresses deleted successfully",
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        mobile: user.mobile,
+      },
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

@@ -1887,6 +1887,195 @@ export const swaggerDocument = {
           500: { description: "Server Error" }
         }
       }
+    },
+    "/admin/users": {
+      get: {
+        tags: ["Admin User Management"],
+        summary: "Get all users (Admin only)",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: "Success",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean" },
+                    count: { type: "number" },
+                    users: {
+                      type: "array",
+                      items: { $ref: "#/components/schemas/User" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          401: { description: "Unauthorized" },
+          403: { description: "Forbidden" },
+          500: { description: "Server Error" }
+        }
+      }
+    },
+    "/admin/user/{id}": {
+      get: {
+        tags: ["Admin User Management"],
+        summary: "Get details of a specific user (Admin only)",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" }
+          }
+        ],
+        responses: {
+          200: {
+            description: "Success",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean" },
+                    user: { $ref: "#/components/schemas/User" },
+                    behavior: {
+                      type: "object",
+                      properties: {
+                        totalOrders: { type: "number" },
+                        totalSpent: { type: "number" },
+                        cancelledOrders: { type: "number" },
+                        cartItems: { type: "number" },
+                        wishlistItems: { type: "number" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          404: { description: "User not found" },
+          401: { description: "Unauthorized" },
+          403: { description: "Forbidden" },
+          500: { description: "Server Error" }
+        }
+      },
+      delete: {
+        tags: ["Admin User Management"],
+        summary: "Delete a user and their associated cart, wishlist, and addresses (Admin only)",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" }
+          }
+        ],
+        responses: {
+          200: {
+            description: "User deleted successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean" },
+                    message: { type: "string" },
+                    user: {
+                      type: "object",
+                      properties: {
+                        _id: { type: "string" },
+                        username: { type: "string" },
+                        email: { type: "string" },
+                        mobile: { type: "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          404: { description: "User not found" },
+          401: { description: "Unauthorized" },
+          403: { description: "Forbidden" },
+          500: { description: "Server Error" }
+        }
+      }
+    },
+    "/admin/user/block/{id}": {
+      patch: {
+        tags: ["Admin User Management"],
+        summary: "Block a user (Admin only)",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" }
+          }
+        ],
+        responses: {
+          200: {
+            description: "User blocked successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean" },
+                    message: { type: "string" },
+                    user: { $ref: "#/components/schemas/User" }
+                  }
+                }
+              }
+            }
+          },
+          404: { description: "User not found" },
+          401: { description: "Unauthorized" },
+          403: { description: "Forbidden" },
+          500: { description: "Server Error" }
+        }
+      }
+    },
+    "/admin/user/unblock/{id}": {
+      patch: {
+        tags: ["Admin User Management"],
+        summary: "Unblock a user (Admin only)",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" }
+          }
+        ],
+        responses: {
+          200: {
+            description: "User unblocked successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean" },
+                    message: { type: "string" },
+                    user: { $ref: "#/components/schemas/User" }
+                  }
+                }
+              }
+            }
+          },
+          404: { description: "User not found" },
+          401: { description: "Unauthorized" },
+          403: { description: "Forbidden" },
+          500: { description: "Server Error" }
+        }
+      }
     }
   }
 };

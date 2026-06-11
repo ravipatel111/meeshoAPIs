@@ -5,6 +5,7 @@ import {
   getUserDetails,
   blockUser,
   unblockUser,
+  deleteUser,
   // getAllSellers,
   // getPendingSellers,
   // getSellerDetails,
@@ -38,6 +39,7 @@ router.get("/admin/users", auth, isAdmin, getAllUsers);
 router.get("/admin/user/:id", auth, isAdmin, getUserDetails);
 router.patch("/admin/user/block/:id", auth, isAdmin, blockUser);
 router.patch("/admin/user/unblock/:id", auth, isAdmin, unblockUser);
+router.delete("/admin/user/:id", auth, isAdmin, deleteUser);
 
 // Seller management routes are disabled for this project
 // router.get("/admin/sellers", auth, isAdmin, getAllSellers);
