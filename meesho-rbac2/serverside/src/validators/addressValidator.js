@@ -42,7 +42,7 @@ export const addAddressSchema = Joi.object({
     "string.max": "Landmark must not exceed 100 characters",
   }),
 
-  addressType: Joi.string().valid("home", "work").default("home").messages({
+  addressType: Joi.string().valid("Home", "Work").default("Home").messages({
     "any.only": "Address type must be home or work",
   }),
 
@@ -50,13 +50,21 @@ export const addAddressSchema = Joi.object({
 });
 
 export const updateAddressSchema = Joi.object({
-  fullName:    Joi.string().min(2).max(60).optional(),
-  mobile:      Joi.string().pattern(/^[6-9]\d{9}$/).optional().messages({ "string.pattern.base": "Mobile must be a valid 10-digit Indian number" }),
-  pincode:     Joi.string().pattern(/^\d{6}$/).optional().messages({ "string.pattern.base": "Pincode must be exactly 6 digits" }),
-  state:       Joi.string().min(2).optional(),
-  city:        Joi.string().min(2).optional(),
+  fullName: Joi.string().min(2).max(60).optional(),
+  mobile: Joi.string()
+    .pattern(/^[6-9]\d{9}$/)
+    .optional()
+    .messages({
+      "string.pattern.base": "Mobile must be a valid 10-digit Indian number",
+    }),
+  pincode: Joi.string()
+    .pattern(/^\d{6}$/)
+    .optional()
+    .messages({ "string.pattern.base": "Pincode must be exactly 6 digits" }),
+  state: Joi.string().min(2).optional(),
+  city: Joi.string().min(2).optional(),
   addressLine: Joi.string().min(5).max(200).optional(),
-  landmark:    Joi.string().max(100).optional().allow(""),
-  addressType: Joi.string().valid("home", "work").optional(),
-  isDefault:   Joi.boolean().optional(),
+  landmark: Joi.string().max(100).optional().allow(""),
+  addressType: Joi.string().valid("Home", "Work").optional(),
+  isDefault: Joi.boolean().optional(),
 });
