@@ -44,8 +44,8 @@ const addressSchema = new mongoose.Schema(
 
     addressType: {
       type: String,
-      enum: ["home", "work"],
-      default: "home",
+      enum: ["Home", "Work"],
+      default: "Home",
     },
 
     isDefault: {
@@ -53,7 +53,7 @@ const addressSchema = new mongoose.Schema(
       default: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 const Address = mongoose.model("Address", addressSchema);
 
