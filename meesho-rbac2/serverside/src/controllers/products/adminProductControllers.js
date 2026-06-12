@@ -76,7 +76,13 @@ export const updateProductByAdmin = async (req, res) => {
 
 export const getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find()
+    const { category, subCategory } = req.query;
+
+    const query = {};
+    if (category) query.category = category;
+    if (subCategory) query.subCategory = subCategory;
+
+    const products = await Product.find(query)
       .populate("seller", "name email")
       .populate("category", "name")
       .populate("subCategory", "name");
@@ -111,40 +117,6 @@ export const getProductsBySeller = async (req, res) => {
   }
 };
 */
-
-export const approveProduct = async (req, res) => {
-  try {
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      { status: "approved" },
-      { new: true }
-    );
-
-    if (!product) return res.status(404).json({ success: false, message: "Product not found" });
-
-    res.json({ success: true, product });
-
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-export const rejectProduct = async (req, res) => {
-  try {
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      { status: "rejected" },
-      { new: true }
-    );
-
-    if (!product) return res.status(404).json({ success: false, message: "Product not found" });
-
-    res.json({ success: true, product });
-
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
 
 export const deleteProductByAdmin = async (req, res) => {
   try {

@@ -23,8 +23,6 @@ import {
 } from "../../controllers/admin/adminDashboard.js";
 
 import {
-  approveProduct,
-  rejectProduct,
   getAllProducts,
   deleteProductByAdmin,
   // getProductsBySeller,
@@ -53,9 +51,8 @@ router.delete("/admin/user/:id", auth, isAdmin, deleteUser);
 // admin product management
 router.get("/admin/getall/products", auth, isAdmin, getAllProducts);
 // router.get("/admin/seller/:sellerId/products", auth, isAdmin, getProductsBySeller);
-router.put("/admin/product/approve/:id", auth, isAdmin, approveProduct);
-router.put("/admin/product/reject/:id", auth, isAdmin, rejectProduct);
 router.delete("/admin/product/delete/:id", auth, isAdmin, deleteProductByAdmin);
+
 
 // admin dashboard routes
 router.get("/admin/dashboard", auth, isAdmin, getAdminDashboard);

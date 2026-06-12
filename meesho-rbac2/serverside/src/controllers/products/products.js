@@ -221,3 +221,23 @@ export const searchProducts = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const getProductsByCategoryAndSubcategory = async (req, res) => {
+  try {
+    const { category, subCategory } = req.query;
+
+    const query = {};
+    if (category) query.category = category;
+    if (subCategory) query.subCategory = subCategory;
+
+    const products = await Product.find(query)
+      .populate("category")
+      .populate("subCategory")
+      .populate("seller", "name email");
+
+    res.status(200).json({ success: true, count: products.length, products });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+

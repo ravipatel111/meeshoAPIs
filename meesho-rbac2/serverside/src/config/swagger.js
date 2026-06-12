@@ -608,6 +608,31 @@ export const swaggerDocument = {
         }
       }
     },
+    "/product/filter": {
+      get: {
+        tags: ["Products"],
+        summary: "Filter products by category and subcategory",
+        parameters: [
+          {
+            name: "category",
+            in: "query",
+            required: false,
+            schema: { type: "string" },
+            description: "Category ID"
+          },
+          {
+            name: "subCategory",
+            in: "query",
+            required: false,
+            schema: { type: "string" },
+            description: "Subcategory ID"
+          }
+        ],
+        responses: {
+          200: { description: "Success" }
+        }
+      }
+    },
     "/product/category/{categoryId}": {
       get: {
         tags: ["Products"],
@@ -686,6 +711,22 @@ export const swaggerDocument = {
         tags: ["Admin Product"],
         summary: "Get admin's products",
         security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "category",
+            in: "query",
+            required: false,
+            schema: { type: "string" },
+            description: "Category ID to filter by"
+          },
+          {
+            name: "subCategory",
+            in: "query",
+            required: false,
+            schema: { type: "string" },
+            description: "Subcategory ID to filter by"
+          }
+        ],
         responses: {
           200: { description: "Success" }
         }
@@ -1622,6 +1663,22 @@ export const swaggerDocument = {
         tags: ["Admin Product"],
         summary: "Get all products for admin with details",
         security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "category",
+            in: "query",
+            required: false,
+            schema: { type: "string" },
+            description: "Category ID to filter by"
+          },
+          {
+            name: "subCategory",
+            in: "query",
+            required: false,
+            schema: { type: "string" },
+            description: "Subcategory ID to filter by"
+          }
+        ],
         responses: {
           200: {
             description: "Success",
@@ -1646,76 +1703,7 @@ export const swaggerDocument = {
         }
       }
     },
-    "/admin/product/approve/{id}": {
-      put: {
-        tags: ["Admin Product"],
-        summary: "Approve a product",
-        security: [{ bearerAuth: [] }],
-        parameters: [
-          {
-            name: "id",
-            in: "path",
-            required: true,
-            schema: { type: "string" }
-          }
-        ],
-        responses: {
-          200: {
-            description: "Product approved successfully",
-            content: {
-              "application/json": {
-                schema: {
-                  type: "object",
-                  properties: {
-                    success: { type: "boolean" },
-                    product: { $ref: "#/components/schemas/Product" }
-                  }
-                }
-              }
-            }
-          },
-          404: { description: "Product not found" },
-          401: { description: "Unauthorized" },
-          403: { description: "Forbidden" },
-          500: { description: "Server Error" }
-        }
-      }
-    },
-    "/admin/product/reject/{id}": {
-      put: {
-        tags: ["Admin Product"],
-        summary: "Reject a product",
-        security: [{ bearerAuth: [] }],
-        parameters: [
-          {
-            name: "id",
-            in: "path",
-            required: true,
-            schema: { type: "string" }
-          }
-        ],
-        responses: {
-          200: {
-            description: "Product rejected successfully",
-            content: {
-              "application/json": {
-                schema: {
-                  type: "object",
-                  properties: {
-                    success: { type: "boolean" },
-                    product: { $ref: "#/components/schemas/Product" }
-                  }
-                }
-              }
-            }
-          },
-          404: { description: "Product not found" },
-          401: { description: "Unauthorized" },
-          403: { description: "Forbidden" },
-          500: { description: "Server Error" }
-        }
-      }
-    },
+
     "/admin/product/delete/{id}": {
       delete: {
         tags: ["Admin Product"],

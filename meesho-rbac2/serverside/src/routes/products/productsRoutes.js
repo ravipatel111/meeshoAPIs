@@ -8,6 +8,7 @@ import {
   getSellerProducts,
   getProductsByCategory,
   searchProducts,
+  getProductsByCategoryAndSubcategory,
 } from "../../controllers/products/products.js";
 import {
   createProductByAdmin,
@@ -41,7 +42,9 @@ router.delete("/admin/product/:id", auth, isAdmin, deleteProductByAdmin);
 // PUBLIC routes — no auth required
 router.get("/product/all", getAllProducts);
 router.get("/product/search", searchProducts);
+router.get("/product/filter", getProductsByCategoryAndSubcategory);
 router.get("/product/category/:categoryId", getProductsByCategory);
 router.get("/product/:id", getProductById);
+
 
 export default router;
