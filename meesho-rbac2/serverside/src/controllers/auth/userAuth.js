@@ -128,6 +128,12 @@ export const loginUser = async (req, res) => {
         .json({ success: false, message: "Invalid credentials" });
     }
 
+    if (user.isDeleted) {
+      return res
+        .status(403)
+        .json({ success: false, message: "This account has been deleted" });
+    }
+
     const match = await bcrypt.compare(password, user.password);
 
     if (!match) {

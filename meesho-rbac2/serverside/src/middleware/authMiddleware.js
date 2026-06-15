@@ -40,6 +40,10 @@ export const auth = async (req, res, next) => {
       return res.status(403).json({ success: false, message: "Your account is blocked by admin" });
     }
 
+    if (account.isDeleted) {
+      return res.status(401).json({ success: false, message: "Account has been deleted" });
+    }
+
     req.user = decoded;
     next();
 

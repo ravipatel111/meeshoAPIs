@@ -8,7 +8,7 @@ import Address from "../../models/addressModel.js";
 
 export const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().select("-password").sort({ createdAt: -1 });
+    const users = await User.find({ isDeleted: { $ne: true } }).select("-password").sort({ createdAt: -1 });
     res.status(200).json({ success: true, count: users.length, users });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -73,17 +73,12 @@ export const deleteUser = async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // Delete related user documents: cart, wishlist, address
-    await Cart.findOneAndDelete({ user: id });
-    await Wishlist.findOneAndDelete({ user: id });
-    await Address.deleteMany({ user: id });
-
-    // Finally delete the user document
-    await User.findByIdAndDelete(id);
+    user.isDeleted = true;
+    await user.save();
 
     res.status(200).json({
       success: true,
-      message: "User and associated cart, wishlist, and addresses deleted successfully",
+      message: "User deleted successfully",
       user: {
         _id: user._id,
         username: user.username,

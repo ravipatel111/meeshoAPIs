@@ -1,6 +1,7 @@
 import User from "../../models/userModel.js";
 import cloudinary from "../../config/cloudinary.js";
 import uploadToCloudinary from "../../utils/uploadToCloudinary.js";
+import { clearCookieOptions } from "../../config/cookieConfig.js";
 
 export const getUserProfile = async (req, res) => {
   try {
@@ -47,6 +48,26 @@ export const updateUserProfile = async (req, res) => {
     );
 
     res.json({ success: true, message: "Profile updated", user: updated });
+
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const deleteUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    user.isDeleted = true;
+    await user.save();
+
+    res.clearCookie("token", clearCookieOptions);
+
+    res.json({ success: true, message: "Account deleted successfully" });
 
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
