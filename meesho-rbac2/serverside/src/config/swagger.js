@@ -1046,7 +1046,7 @@ export const swaggerDocument = {
                 required: ["addressId", "paymentMethod"],
                 properties: {
                   addressId: { type: "string" },
-                  paymentMethod: { type: "string", example: "COD" }
+                  paymentMethod: { type: "string", example: "upi" }
                 }
               }
             }

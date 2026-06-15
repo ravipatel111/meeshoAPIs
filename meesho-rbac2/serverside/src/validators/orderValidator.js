@@ -15,8 +15,8 @@ export const createOrderSchema = Joi.object({
     "any.required": "Address ID is required",
   }),
 
-  paymentMethod: Joi.string().valid("cod", "upi", "card").required().messages({
-    "any.only": "paymentMethod must be one of cod, upi, card",
+  paymentMethod: Joi.string().valid("upi", "card").required().messages({
+    "any.only": "paymentMethod must be one of upi, card",
     "any.required": "paymentMethod is required",
   }),
 });
