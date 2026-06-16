@@ -35,11 +35,13 @@ export const createProductSchema = Joi.object({
     "number.integer": "Stock must be a whole number",
   }),
   existingImages: Joi.any().optional(),
+  existingVideos: Joi.any().optional(),
   variants: Joi.any().optional(),
   size: Joi.any().optional(),
   sizes: Joi.any().optional(),
   color: Joi.any().optional(),
   colors: Joi.any().optional(),
+  videos: Joi.any().optional(),
 });
 
 export const updateProductSchema = Joi.object({
@@ -52,9 +54,11 @@ export const updateProductSchema = Joi.object({
   seller:        Joi.string().optional(),
   stock:         Joi.number().integer().min(0).optional().messages({ "number.min": "Stock cannot be negative" }),
   existingImages: Joi.any().optional(),
+  existingVideos: Joi.any().optional(),
   variants:      Joi.any().optional(),
   size:          Joi.any().optional(),
   sizes:         Joi.any().optional(),
   color:         Joi.any().optional(),
   colors:        Joi.any().optional(),
+  videos:        Joi.any().optional(),
 });

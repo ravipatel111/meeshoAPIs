@@ -16,10 +16,18 @@ export const createProduct = async (req, res) => {
     }
 
     let images = [];
-    if (req.files && req.files.length > 0) {
-      for (let file of req.files) {
-        const uploaded = await uploadToCloudinary(file.buffer, "meesho/products");
+    if (req.files && req.files.images && req.files.images.length > 0) {
+      for (let file of req.files.images) {
+        const uploaded = await uploadToCloudinary(file.buffer, "meesho/products", "image");
         images.push(uploaded);
+      }
+    }
+
+    let videos = [];
+    if (req.files && req.files.videos && req.files.videos.length > 0) {
+      for (let file of req.files.videos) {
+        const uploaded = await uploadToCloudinary(file.buffer, "meesho/products", "video");
+        videos.push(uploaded);
       }
     }
 
@@ -31,6 +39,7 @@ export const createProduct = async (req, res) => {
       category,
       subCategory,
       images,
+      videos,
       stock,
       variants: parsedVariants,
       seller: req.user.userId,
@@ -68,18 +77,89 @@ export const updateProduct = async (req, res) => {
       return res.status(404).json({ success: false, message: "Product not found" });
     }
 
-    if (req.files && req.files.length > 0) {
+    // Process images update
+    let finalImages = product.images || [];
+    if (req.body.existingImages !== undefined) {
+      let existingImages = req.body.existingImages;
+      if (typeof existingImages === "string") {
+        try {
+          existingImages = JSON.parse(existingImages);
+        } catch (e) {
+          existingImages = [];
+        }
+      }
+      if (!Array.isArray(existingImages)) {
+        existingImages = existingImages ? [existingImages] : [];
+      }
+
+      const existingPublicIds = new Set(
+        existingImages.map(img => typeof img === "string" ? img : img.public_id).filter(Boolean)
+      );
+
+      const imagesToDelete = finalImages.filter(img => img.public_id && !existingPublicIds.has(img.public_id));
+      for (let img of imagesToDelete) {
+        await cloudinary.uploader.destroy(img.public_id);
+      }
+
+      finalImages = finalImages.filter(img => img.public_id && existingPublicIds.has(img.public_id));
+    } else if (req.files && req.files.images && req.files.images.length > 0) {
       for (let img of product.images) {
         if (img.public_id) await cloudinary.uploader.destroy(img.public_id);
       }
-
-      const newImages = [];
-      for (let file of req.files) {
-        const uploaded = await uploadToCloudinary(file.buffer, "meesho/products");
-        newImages.push(uploaded);
-      }
-      req.body.images = newImages;
+      finalImages = [];
     }
+
+    if (req.files && req.files.images && req.files.images.length > 0) {
+      for (let file of req.files.images) {
+        const uploaded = await uploadToCloudinary(file.buffer, "meesho/products", "image");
+        finalImages.push(uploaded);
+      }
+    }
+    req.body.images = finalImages;
+
+    // Process videos update
+    let finalVideos = product.videos || [];
+    if (req.body.existingVideos !== undefined) {
+      let existingVideos = req.body.existingVideos;
+      if (typeof existingVideos === "string") {
+        try {
+          existingVideos = JSON.parse(existingVideos);
+        } catch (e) {
+          existingVideos = [];
+        }
+      }
+      if (!Array.isArray(existingVideos)) {
+        existingVideos = existingVideos ? [existingVideos] : [];
+      }
+
+      const existingPublicIds = new Set(
+        existingVideos.map(vid => typeof vid === "string" ? vid : vid.public_id).filter(Boolean)
+      );
+
+      const videosToDelete = finalVideos.filter(vid => vid.public_id && !existingPublicIds.has(vid.public_id));
+      for (let vid of videosToDelete) {
+        await cloudinary.uploader.destroy(vid.public_id, { resource_type: "video" });
+      }
+
+      finalVideos = finalVideos.filter(vid => vid.public_id && existingPublicIds.has(vid.public_id));
+    } else if (req.files && req.files.videos && req.files.videos.length > 0) {
+      for (let vid of product.videos) {
+        if (vid.public_id) await cloudinary.uploader.destroy(vid.public_id, { resource_type: "video" });
+      }
+      finalVideos = [];
+    }
+
+    if (req.files && req.files.videos && req.files.videos.length > 0) {
+      for (let file of req.files.videos) {
+        const uploaded = await uploadToCloudinary(file.buffer, "meesho/products", "video");
+        finalVideos.push(uploaded);
+      }
+    }
+    req.body.videos = finalVideos;
+
+    // Clean up temporary body fields
+    delete req.body.existingImages;
+    delete req.body.existingVideos;
 
     if (req.body.variants) {
       req.body.variants = typeof req.body.variants === "string" ? JSON.parse(req.body.variants) : req.body.variants;
@@ -109,8 +189,12 @@ export const deleteProduct = async (req, res) => {
       return res.status(404).json({ success: false, message: "Product not found" });
     }
 
-    for (let img of product.images) {
+    for (let img of product.images || []) {
       if (img.public_id) await cloudinary.uploader.destroy(img.public_id);
+    }
+
+    for (let vid of product.videos || []) {
+      if (vid.public_id) await cloudinary.uploader.destroy(vid.public_id, { resource_type: "video" });
     }
 
     await Product.findOneAndDelete({ _id: req.params.id, seller: req.user.userId });

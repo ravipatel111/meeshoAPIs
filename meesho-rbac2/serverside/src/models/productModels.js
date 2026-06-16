@@ -46,6 +46,13 @@ const productSchema = new mongoose.Schema(
       }
     ],
 
+    videos: [
+      {
+        url: String,
+        public_id: String,
+      }
+    ],
+
     stock: {
       type: Number,
       default: 0,
