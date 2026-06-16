@@ -36,6 +36,10 @@ export const createProductSchema = Joi.object({
   }),
   existingImages: Joi.any().optional(),
   variants: Joi.any().optional(),
+  size: Joi.any().optional(),
+  sizes: Joi.any().optional(),
+  color: Joi.any().optional(),
+  colors: Joi.any().optional(),
 });
 
 export const updateProductSchema = Joi.object({
@@ -49,4 +53,8 @@ export const updateProductSchema = Joi.object({
   stock:         Joi.number().integer().min(0).optional().messages({ "number.min": "Stock cannot be negative" }),
   existingImages: Joi.any().optional(),
   variants:      Joi.any().optional(),
+  size:          Joi.any().optional(),
+  sizes:         Joi.any().optional(),
+  color:         Joi.any().optional(),
+  colors:        Joi.any().optional(),
 });

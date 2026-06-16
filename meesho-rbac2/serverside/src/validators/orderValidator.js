@@ -19,4 +19,9 @@ export const createOrderSchema = Joi.object({
     "any.only": "paymentMethod must be one of upi, card",
     "any.required": "paymentMethod is required",
   }),
+
+  variantId: Joi.string().optional().allow(""),
+  size: Joi.string().optional().allow(""),
+  sizes: Joi.any().optional(),
+  color: Joi.string().optional().allow(""),
 });
