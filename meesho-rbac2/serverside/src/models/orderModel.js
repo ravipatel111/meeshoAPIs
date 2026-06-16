@@ -19,7 +19,15 @@ const orderSchema = new mongoose.Schema(
     ref: "Product",
     required: true
   },
-
+  variant: {
+    type: mongoose.Schema.Types.ObjectId,
+  },
+  size: {
+    type: String,
+  },
+  color: {
+    type: String,
+  },
   quantity: {
     type: Number,
     default: 1

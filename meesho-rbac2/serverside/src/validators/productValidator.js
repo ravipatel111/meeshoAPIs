@@ -35,6 +35,7 @@ export const createProductSchema = Joi.object({
     "number.integer": "Stock must be a whole number",
   }),
   existingImages: Joi.any().optional(),
+  variants: Joi.any().optional(),
 });
 
 export const updateProductSchema = Joi.object({
@@ -47,4 +48,5 @@ export const updateProductSchema = Joi.object({
   seller:        Joi.string().optional(),
   stock:         Joi.number().integer().min(0).optional().messages({ "number.min": "Stock cannot be negative" }),
   existingImages: Joi.any().optional(),
+  variants:      Joi.any().optional(),
 });

@@ -14,7 +14,8 @@ import {
   createProductByAdmin,
   updateProductByAdmin,
   deleteProductByAdmin,
-  getAllProducts as adminGetAllProducts
+  getAllProducts as adminGetAllProducts,
+  updateVariantStock
 } from "../../controllers/products/adminProductControllers.js";
 import { auth, isAdmin } from "../../middleware/authMiddleware.js";
 // import { auth, isSeller, isSellerApproved } from "../../middleware/authMiddleware.js"; // seller guards removed
@@ -38,6 +39,7 @@ router.post("/admin/product/create", auth, isAdmin, uploadProductImages, validat
 router.get("/admin/product/my", auth, isAdmin, adminGetAllProducts);
 router.put("/admin/product/:id", auth, isAdmin, uploadProductImages, validate(updateProductSchema), updateProductByAdmin);
 router.delete("/admin/product/:id", auth, isAdmin, deleteProductByAdmin);
+router.patch("/products/:productId/variants/:variantId", auth, isAdmin, updateVariantStock);
 
 // PUBLIC routes — no auth required
 router.get("/product/all", getAllProducts);

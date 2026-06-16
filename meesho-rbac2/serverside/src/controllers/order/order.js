@@ -6,7 +6,7 @@ import Payment from "../../models/paymentModel.js";
 
 export const createOrder = async (req, res) => {
   try {
-    const { product, quantity, addressId, paymentMethod } = req.body;
+    const { product, quantity, addressId, paymentMethod, variantId } = req.body;
 
     if (!product || !quantity || !addressId || !paymentMethod) {
       return res.status(400).json({
@@ -20,12 +20,29 @@ export const createOrder = async (req, res) => {
       return res.status(404).json({ success: false, message: "Product not found" });
     }
 
-    // Fix: check stock availability before placing order
-    if (productData.stock < quantity) {
-      return res.status(400).json({
-        success: false,
-        message: `Only ${productData.stock} item(s) available in stock`,
-      });
+    let selectedVariant = null;
+    let price = productData.price;
+
+    if (variantId) {
+      selectedVariant = productData.variants.id(variantId);
+      if (!selectedVariant) {
+        return res.status(404).json({ success: false, message: "Variant not found" });
+      }
+      if (selectedVariant.stock < quantity) {
+        return res.status(400).json({
+          success: false,
+          message: `Only ${selectedVariant.stock} item(s) available in stock for this variant`,
+        });
+      }
+      price = selectedVariant.price;
+    } else {
+      // Fix: check stock availability before placing order
+      if (productData.stock < quantity) {
+        return res.status(400).json({
+          success: false,
+          message: `Only ${productData.stock} item(s) available in stock`,
+        });
+      }
     }
 
     const addressData = await Address.findOne({ _id: addressId, user: req.user.userId });
@@ -49,14 +66,23 @@ export const createOrder = async (req, res) => {
       addressType: addressData.addressType,
     };
 
-    const totalPrice = productData.price * quantity;
+    const totalPrice = price * quantity;
 
     // Fix: decrement stock atomically to prevent overselling
-    const updatedProduct = await Product.findOneAndUpdate(
-      { _id: product, stock: { $gte: quantity } },
-      { $inc: { stock: -quantity } },
-      { new: true }
-    );
+    let updatedProduct;
+    if (variantId) {
+      updatedProduct = await Product.findOneAndUpdate(
+        { _id: product, "variants._id": variantId, "variants.stock": { $gte: quantity } },
+        { $inc: { "variants.$.stock": -quantity } },
+        { new: true }
+      );
+    } else {
+      updatedProduct = await Product.findOneAndUpdate(
+        { _id: product, stock: { $gte: quantity } },
+        { $inc: { stock: -quantity } },
+        { new: true }
+      );
+    }
 
     if (!updatedProduct) {
       return res.status(400).json({
@@ -65,7 +91,7 @@ export const createOrder = async (req, res) => {
       });
     }
 
-    const order = await Order.create({
+    const orderData = {
       user: req.user.userId,
       seller: productData.seller,
       product,
@@ -74,7 +100,17 @@ export const createOrder = async (req, res) => {
       deliveryAddress,
       paymentStatus: "pending",
       orderStatus: "pending",
-    });
+    };
+
+    if (selectedVariant) {
+      orderData.variant = variantId;
+      orderData.size = selectedVariant.size;
+      if (selectedVariant.color) {
+        orderData.color = selectedVariant.color;
+      }
+    }
+
+    const order = await Order.create(orderData);
 
     const payment = await Payment.create({
       order: order._id,
@@ -158,9 +194,16 @@ export const cancelOrder = async (req, res) => {
     }
 
     // Fix: restore stock when order is cancelled
-    await Product.findByIdAndUpdate(order.product, {
-      $inc: { stock: order.quantity },
-    });
+    if (order.variant) {
+      await Product.findOneAndUpdate(
+        { _id: order.product, "variants._id": order.variant },
+        { $inc: { "variants.$.stock": order.quantity } }
+      );
+    } else {
+      await Product.findByIdAndUpdate(order.product, {
+        $inc: { stock: order.quantity },
+      });
+    }
 
     order.orderStatus = "cancelled";
     await order.save();

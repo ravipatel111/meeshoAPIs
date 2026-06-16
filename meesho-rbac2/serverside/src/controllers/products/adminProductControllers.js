@@ -4,12 +4,17 @@ import uploadToCloudinary from "../../utils/uploadToCloudinary.js";
 
 export const createProductByAdmin = async (req, res) => {
   try {
-    const { title, description, price, discountPrice, category, subCategory, stock, seller } = req.body;
+    const { title, description, price, discountPrice, category, subCategory, stock, seller, variants } = req.body;
 
     const adminId = seller || req.user.adminId;
 
     if (!title || !price || !category || !adminId) {
       return res.status(400).json({ success: false, message: "title, price, category, and seller (admin) are required" });
+    }
+
+    let parsedVariants = [];
+    if (variants) {
+      parsedVariants = typeof variants === "string" ? JSON.parse(variants) : variants;
     }
 
     let images = [];
@@ -29,6 +34,7 @@ export const createProductByAdmin = async (req, res) => {
       subCategory,
       images,
       stock,
+      variants: parsedVariants,
       seller: adminId,
       status: "approved", // admin products are automatically approved
     });
@@ -59,6 +65,10 @@ export const updateProductByAdmin = async (req, res) => {
         newImages.push(uploaded);
       }
       req.body.images = newImages;
+    }
+
+    if (req.body.variants) {
+      req.body.variants = typeof req.body.variants === "string" ? JSON.parse(req.body.variants) : req.body.variants;
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
@@ -213,4 +223,32 @@ export const updateStock = async (req, res) => {
   }
 };
 */
+
+export const updateVariantStock = async (req, res) => {
+  try {
+    const { productId, variantId } = req.params;
+    const { stock } = req.body;
+
+    if (stock === undefined) {
+      return res.status(400).json({ success: false, message: "stock is required" });
+    }
+
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+    const variant = product.variants.id(variantId);
+    if (!variant) {
+      return res.status(404).json({ success: false, message: "Variant not found" });
+    }
+
+    variant.stock = stock;
+    await product.save();
+
+    res.json({ success: true, message: "Variant stock updated successfully", data: product });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 

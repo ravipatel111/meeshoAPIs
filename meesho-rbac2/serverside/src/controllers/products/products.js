@@ -4,10 +4,15 @@ import uploadToCloudinary from "../../utils/uploadToCloudinary.js";
 
 export const createProduct = async (req, res) => {
   try {
-    const { title, description, price, discountPrice, category, subCategory, stock } = req.body;
+    const { title, description, price, discountPrice, category, subCategory, stock, variants } = req.body;
 
     if (!title || !price || !category) {
       return res.status(400).json({ success: false, message: "title, price and category are required" });
+    }
+
+    let parsedVariants = [];
+    if (variants) {
+      parsedVariants = typeof variants === "string" ? JSON.parse(variants) : variants;
     }
 
     let images = [];
@@ -27,6 +32,7 @@ export const createProduct = async (req, res) => {
       subCategory,
       images,
       stock,
+      variants: parsedVariants,
       seller: req.user.userId,
     });
 
@@ -73,6 +79,10 @@ export const updateProduct = async (req, res) => {
         newImages.push(uploaded);
       }
       req.body.images = newImages;
+    }
+
+    if (req.body.variants) {
+      req.body.variants = typeof req.body.variants === "string" ? JSON.parse(req.body.variants) : req.body.variants;
     }
 
     const updatedProduct = await Product.findOneAndUpdate(

@@ -59,6 +59,14 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    variants: [
+      {
+        size: { type: String, required: true },
+        color: { type: String },
+        stock: { type: Number, required: true },
+        price: { type: Number, required: true }
+      }
+    ],
   },
   { timestamps: true }
 );
