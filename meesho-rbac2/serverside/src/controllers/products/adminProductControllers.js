@@ -4,23 +4,43 @@ import uploadToCloudinary from "../../utils/uploadToCloudinary.js";
 
 export const createProductByAdmin = async (req, res) => {
   try {
-    const { title, description, price, discountPrice, category, subCategory, stock, seller, variants } = req.body;
+    const {
+      title,
+      description,
+      price,
+      discountPrice,
+      category,
+      subCategory,
+      stock,
+      seller,
+      variants,
+    } = req.body;
 
     const adminId = seller || req.user.adminId;
 
     if (!title || !price || !category || !adminId) {
-      return res.status(400).json({ success: false, message: "title, price, category, and seller (admin) are required" });
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "title, price, category, and seller (admin) are required",
+        });
     }
 
     let parsedVariants = [];
     if (variants) {
-      parsedVariants = typeof variants === "string" ? JSON.parse(variants) : variants;
+      parsedVariants =
+        typeof variants === "string" ? JSON.parse(variants) : variants;
     }
 
     let images = [];
     if (req.files && req.files.images && req.files.images.length > 0) {
       for (let file of req.files.images) {
-        const uploaded = await uploadToCloudinary(file.buffer, "meesho/products", "image");
+        const uploaded = await uploadToCloudinary(
+          file.buffer,
+          "meesho/products",
+          "image",
+        );
         images.push(uploaded);
       }
     }
@@ -28,7 +48,11 @@ export const createProductByAdmin = async (req, res) => {
     let videos = [];
     if (req.files && req.files.videos && req.files.videos.length > 0) {
       for (let file of req.files.videos) {
-        const uploaded = await uploadToCloudinary(file.buffer, "meesho/products", "video");
+        const uploaded = await uploadToCloudinary(
+          file.buffer,
+          "meesho/products",
+          "video",
+        );
         videos.push(uploaded);
       }
     }
@@ -49,7 +73,6 @@ export const createProductByAdmin = async (req, res) => {
     });
 
     res.status(201).json({ success: true, data: product });
-
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -60,7 +83,9 @@ export const updateProductByAdmin = async (req, res) => {
     const product = await Product.findById(req.params.id);
 
     if (!product) {
-      return res.status(404).json({ success: false, message: "Product not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
     }
 
     // Process images update
@@ -79,15 +104,21 @@ export const updateProductByAdmin = async (req, res) => {
       }
 
       const existingPublicIds = new Set(
-        existingImages.map(img => typeof img === "string" ? img : img.public_id).filter(Boolean)
+        existingImages
+          .map((img) => (typeof img === "string" ? img : img.public_id))
+          .filter(Boolean),
       );
 
-      const imagesToDelete = finalImages.filter(img => img.public_id && !existingPublicIds.has(img.public_id));
+      const imagesToDelete = finalImages.filter(
+        (img) => img.public_id && !existingPublicIds.has(img.public_id),
+      );
       for (let img of imagesToDelete) {
         await cloudinary.uploader.destroy(img.public_id);
       }
 
-      finalImages = finalImages.filter(img => img.public_id && existingPublicIds.has(img.public_id));
+      finalImages = finalImages.filter(
+        (img) => img.public_id && existingPublicIds.has(img.public_id),
+      );
     } else if (req.files && req.files.images && req.files.images.length > 0) {
       for (let img of product.images) {
         if (img.public_id) await cloudinary.uploader.destroy(img.public_id);
@@ -97,7 +128,11 @@ export const updateProductByAdmin = async (req, res) => {
 
     if (req.files && req.files.images && req.files.images.length > 0) {
       for (let file of req.files.images) {
-        const uploaded = await uploadToCloudinary(file.buffer, "meesho/products", "image");
+        const uploaded = await uploadToCloudinary(
+          file.buffer,
+          "meesho/products",
+          "image",
+        );
         finalImages.push(uploaded);
       }
     }
@@ -119,25 +154,40 @@ export const updateProductByAdmin = async (req, res) => {
       }
 
       const existingPublicIds = new Set(
-        existingVideos.map(vid => typeof vid === "string" ? vid : vid.public_id).filter(Boolean)
+        existingVideos
+          .map((vid) => (typeof vid === "string" ? vid : vid.public_id))
+          .filter(Boolean),
       );
 
-      const videosToDelete = finalVideos.filter(vid => vid.public_id && !existingPublicIds.has(vid.public_id));
+      const videosToDelete = finalVideos.filter(
+        (vid) => vid.public_id && !existingPublicIds.has(vid.public_id),
+      );
       for (let vid of videosToDelete) {
-        await cloudinary.uploader.destroy(vid.public_id, { resource_type: "video" });
+        await cloudinary.uploader.destroy(vid.public_id, {
+          resource_type: "video",
+        });
       }
 
-      finalVideos = finalVideos.filter(vid => vid.public_id && existingPublicIds.has(vid.public_id));
+      finalVideos = finalVideos.filter(
+        (vid) => vid.public_id && existingPublicIds.has(vid.public_id),
+      );
     } else if (req.files && req.files.videos && req.files.videos.length > 0) {
       for (let vid of product.videos) {
-        if (vid.public_id) await cloudinary.uploader.destroy(vid.public_id, { resource_type: "video" });
+        if (vid.public_id)
+          await cloudinary.uploader.destroy(vid.public_id, {
+            resource_type: "video",
+          });
       }
       finalVideos = [];
     }
 
     if (req.files && req.files.videos && req.files.videos.length > 0) {
       for (let file of req.files.videos) {
-        const uploaded = await uploadToCloudinary(file.buffer, "meesho/products", "video");
+        const uploaded = await uploadToCloudinary(
+          file.buffer,
+          "meesho/products",
+          "video",
+        );
         finalVideos.push(uploaded);
       }
     }
@@ -148,17 +198,19 @@ export const updateProductByAdmin = async (req, res) => {
     delete req.body.existingVideos;
 
     if (req.body.variants) {
-      req.body.variants = typeof req.body.variants === "string" ? JSON.parse(req.body.variants) : req.body.variants;
+      req.body.variants =
+        typeof req.body.variants === "string"
+          ? JSON.parse(req.body.variants)
+          : req.body.variants;
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true }
+      { new: true },
     );
 
     res.json({ success: true, data: updatedProduct });
-
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -178,7 +230,6 @@ export const getAllProducts = async (req, res) => {
       .populate("subCategory", "name");
 
     res.json({ success: true, products });
-
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -212,20 +263,25 @@ export const deleteProductByAdmin = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
 
-    if (!product) return res.status(404).json({ success: false, message: "Product not found" });
+    if (!product)
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
 
     for (let img of product.images || []) {
       if (img.public_id) await cloudinary.uploader.destroy(img.public_id);
     }
 
     for (let vid of product.videos || []) {
-      if (vid.public_id) await cloudinary.uploader.destroy(vid.public_id, { resource_type: "video" });
+      if (vid.public_id)
+        await cloudinary.uploader.destroy(vid.public_id, {
+          resource_type: "video",
+        });
     }
 
     await Product.findByIdAndDelete(req.params.id);
 
     res.json({ success: true, message: "Product deleted" });
-
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -320,25 +376,34 @@ export const updateVariantStock = async (req, res) => {
     const { stock } = req.body;
 
     if (stock === undefined) {
-      return res.status(400).json({ success: false, message: "stock is required" });
+      return res
+        .status(400)
+        .json({ success: false, message: "stock is required" });
     }
 
     const product = await Product.findById(productId);
     if (!product) {
-      return res.status(404).json({ success: false, message: "Product not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
     }
 
     const variant = product.variants.id(variantId);
     if (!variant) {
-      return res.status(404).json({ success: false, message: "Variant not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Variant not found" });
     }
 
     variant.stock = stock;
     await product.save();
 
-    res.json({ success: true, message: "Variant stock updated successfully", data: product });
+    res.json({
+      success: true,
+      message: "Variant stock updated successfully",
+      data: product,
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-
