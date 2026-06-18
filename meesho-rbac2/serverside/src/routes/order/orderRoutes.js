@@ -4,6 +4,7 @@ import {
   getUserOrders,
   cancelOrder,
   raiseDispute,
+  returnOrder,
 } from "../../controllers/order/order.js";
 import {
   getAllOrders,
@@ -20,6 +21,7 @@ const router = express.Router();
 router.post("/order/create", auth, isUser, validate(createOrderSchema), createOrder);
 router.get("/order/my", auth, isUser, getUserOrders);
 router.put("/order/cancel/:id", auth, isUser, cancelOrder);
+router.put("/order/return/:id", auth, isUser, returnOrder);
 router.put("/order/dispute/:id", auth, isUser, raiseDispute);
 
 // ADMIN

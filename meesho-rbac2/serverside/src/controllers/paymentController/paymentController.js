@@ -6,13 +6,20 @@ export const createPayment = async (req, res) => {
     const { orderId, paymentMethod } = req.body;
 
     if (!orderId || !paymentMethod) {
-      return res.status(400).json({ success: false, message: "orderId and paymentMethod are required" });
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "orderId and paymentMethod are required",
+        });
     }
 
     const order = await Order.findById(orderId);
 
     if (!order) {
-      return res.status(404).json({ success: false, message: "Order not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
     }
 
     const payment = await Payment.create({
@@ -24,10 +31,12 @@ export const createPayment = async (req, res) => {
       transactionId: "TXN" + Date.now(),
     });
 
-    await Order.findByIdAndUpdate(orderId, { paymentStatus: "paid", orderStatus: "confirmed" });
+    await Order.findByIdAndUpdate(orderId, {
+      paymentStatus: "paid",
+      orderStatus: "confirmed",
+    });
 
     res.json({ success: true, payment });
-
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -40,7 +49,6 @@ export const getUserPayments = async (req, res) => {
       .sort({ createdAt: -1 });
 
     res.json({ success: true, payments });
-
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -67,7 +75,7 @@ export const getSellerPaymentsById = async (req, res) => {
         populate: { path: "product", select: "title price images" },
       })
       .sort({ createdAt: -1 });
-
+  
     const totalEarnings = payments
       .filter((p) => p.paymentStatus === "success")
       .reduce((sum, p) => sum + p.amount, 0);

@@ -1,6 +1,6 @@
 import Order from "../../models/orderModel.js";
 
-const VALID_ORDER_STATUSES = ["pending", "confirmed", "shipped", "delivered", "cancelled"];
+const VALID_ORDER_STATUSES = ["pending", "confirmed", "shipped", "delivered", "cancelled", "returned"];
 
 export const getAllOrders = async (req, res) => {
   try {

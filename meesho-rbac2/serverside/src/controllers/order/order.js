@@ -242,3 +242,43 @@ export const raiseDispute = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const returnOrder = async (req, res) => {
+  try {
+    const order = await Order.findOne({
+      _id: req.params.id,
+      user: req.user.userId,
+    });
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    if (order.orderStatus !== "delivered") {
+      return res.status(400).json({
+        success: false,
+        message: `Only delivered orders can be returned, currently it is ${order.orderStatus}`,
+      });
+    }
+
+    // Restore inventory stock
+    if (order.variant) {
+      await Product.findOneAndUpdate(
+        { _id: order.product, "variants._id": order.variant },
+        { $inc: { "variants.$.stock": order.quantity } }
+      );
+    } else {
+      await Product.findByIdAndUpdate(order.product, {
+        $inc: { stock: order.quantity },
+      });
+    }
+
+    order.orderStatus = "returned";
+    await order.save();
+
+    res.json({ success: true, message: "Order returned successfully", order });
+
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
