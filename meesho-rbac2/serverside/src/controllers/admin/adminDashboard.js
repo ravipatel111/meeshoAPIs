@@ -51,8 +51,9 @@ export const getOrderStats = async (req, res) => {
     const shipped = await Order.countDocuments({ orderStatus: "shipped" });
     const delivered = await Order.countDocuments({ orderStatus: "delivered" });
     const cancelled = await Order.countDocuments({ orderStatus: "cancelled" });
+    const returned = await Order.countDocuments({ orderStatus: "returned" });
 
-    res.json({ success: true, orders: { pending, shipped, delivered, cancelled } });
+    res.json({ success: true, orders: { pending, shipped, delivered, cancelled, returned } });
 
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

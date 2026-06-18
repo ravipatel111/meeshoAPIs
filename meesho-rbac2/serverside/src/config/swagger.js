@@ -122,7 +122,7 @@ export const swaggerDocument = {
           },
           totalAmount: { type: "number" },
           shippingAddress: { type: "string" },
-          status: { type: "string", enum: ["pending", "processing", "shipped", "delivered", "cancelled"] },
+          status: { type: "string", enum: ["pending", "processing", "shipped", "delivered", "cancelled", "returned"] },
           paymentStatus: { type: "string", enum: ["pending", "paid", "failed", "refunded"] },
           dispute: {
             type: "object",
@@ -1095,6 +1095,40 @@ export const swaggerDocument = {
         }
       }
     },
+    "/order/return/{id}": {
+      put: {
+        tags: ["Orders"],
+        summary: "Return order",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" }
+          }
+        ],
+        responses: {
+          200: {
+            description: "Order returned successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean" },
+                    message: { type: "string" },
+                    order: { $ref: "#/components/schemas/Order" }
+                  }
+                }
+              }
+            }
+          },
+          400: { description: "Only delivered orders can be returned" },
+          404: { description: "Order not found" }
+        }
+      }
+    },
     "/order/dispute/{id}": {
       put: {
         tags: ["Orders"],
@@ -1158,7 +1192,7 @@ export const swaggerDocument = {
                 type: "object",
                 required: ["status"],
                 properties: {
-                  status: { type: "string", enum: ["processing", "shipped", "delivered", "cancelled"] }
+                  status: { type: "string", enum: ["pending", "confirmed", "shipped", "delivered", "cancelled", "returned"] }
                 }
               }
             }
@@ -1793,7 +1827,8 @@ export const swaggerDocument = {
                         pending: { type: "number" },
                         shipped: { type: "number" },
                         delivered: { type: "number" },
-                        cancelled: { type: "number" }
+                        cancelled: { type: "number" },
+                        returned: { type: "number" }
                       }
                     }
                   }
