@@ -51,7 +51,7 @@ export const loginAdmin = async (req, res) => {
       expiresIn: "1d",
     });
 
-    res.cookie("token", token, cookieOptions);
+    res.cookie("admin_token", token, cookieOptions);
 
     res.json({
       success: true,
@@ -69,7 +69,7 @@ export const loginAdmin = async (req, res) => {
 };
 
 export const logoutAdmin = async (req, res) => {
-  res.clearCookie("token", clearCookieOptions);
+  res.clearCookie("admin_token", clearCookieOptions);
   res.json({ success: true, message: "Admin logout success" });
 };
 
@@ -106,9 +106,10 @@ export const changeAdminPassword = async (req, res) => {
     admin.password = await bcrypt.hash(newPassword, 10);
     await admin.save();
 
-    res.status(200).json({ success: true, message: "Password changed successfully" });
+    res
+      .status(200)
+      .json({ success: true, message: "Password changed successfully" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-

@@ -6,7 +6,8 @@ import Admin from "../models/adminModel.js";
 export const auth = async (req, res, next) => {
   try {
     const token =
-      req.cookies.token ||
+      req.cookies.admin_token ||
+      req.cookies.user_token ||
       req.headers.authorization?.split(" ")[1];
 
     if (!token) {
@@ -33,20 +34,25 @@ export const auth = async (req, res, next) => {
     }
 
     if (!account) {
-      return res.status(401).json({ success: false, message: "Account not found" });
+      return res
+        .status(401)
+        .json({ success: false, message: "Account not found" });
     }
 
     if (account.isBlocked) {
-      return res.status(403).json({ success: false, message: "Your account is blocked by admin" });
+      return res
+        .status(403)
+        .json({ success: false, message: "Your account is blocked by admin" });
     }
 
     if (account.isDeleted) {
-      return res.status(401).json({ success: false, message: "Account has been deleted" });
+      return res
+        .status(401)
+        .json({ success: false, message: "Account has been deleted" });
     }
 
     req.user = decoded;
     next();
-
   } catch (error) {
     res.status(401).json({ success: false, message: "Invalid token" });
   }
@@ -54,7 +60,9 @@ export const auth = async (req, res, next) => {
 
 export const isUser = (req, res, next) => {
   if (req.user.role !== "user") {
-    return res.status(403).json({ success: false, message: "User only access" });
+    return res
+      .status(403)
+      .json({ success: false, message: "User only access" });
   }
   next();
 };
@@ -80,7 +88,9 @@ export const isUser = (req, res, next) => {
 
 export const isAdmin = (req, res, next) => {
   if (req.user.role !== "admin") {
-    return res.status(403).json({ success: false, message: "Admin only access" });
+    return res
+      .status(403)
+      .json({ success: false, message: "Admin only access" });
   }
   next();
 };

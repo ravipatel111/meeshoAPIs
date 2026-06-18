@@ -160,7 +160,7 @@ export const loginUser = async (req, res) => {
       { expiresIn: "1d" },
     );
 
-    res.cookie("token", token, cookieOptions);
+    res.cookie("user_token", token, cookieOptions);
 
     return res.status(200).json({
       success: true,
@@ -316,6 +316,6 @@ export const changeUserPassword = async (req, res) => {
 };
 
 export const logoutUser = async (req, res) => {
-  res.clearCookie("token", clearCookieOptions);
+  res.clearCookie("user_token", clearCookieOptions);
   res.json({ success: true, message: "Logged out successfully" });
 };
