@@ -3,7 +3,7 @@ import Payment from "../../models/paymentModel.js";
 export const getAllPayments = async (req, res) => {
   try {
     const payments = await Payment.find()
-      .populate("user", "username email")
+      .populate("user", "username email profileImage")
       .populate("order");
 
     res.json({ success: true, payments });

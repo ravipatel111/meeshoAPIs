@@ -129,7 +129,7 @@ export const createOrder = async (req, res) => {
     const populatedOrder = await Order.findById(order._id)
       .populate("product", "title price images")
       .populate("seller", "name email")
-      .populate("user", "username email mobile");
+      .populate("user", "username email mobile profileImage");
 
     res.status(201).json({
       success: true,
@@ -147,7 +147,7 @@ export const getUserOrders = async (req, res) => {
     const orders = await Order.find({ user: req.user.userId })
       .populate("product", "title price images")
       .populate("seller", "name email")
-      .populate("user", "username email mobile")
+      .populate("user", "username email mobile profileImage")
       .sort({ createdAt: -1 });
 
     res.json({ success: true, orders });
@@ -161,7 +161,7 @@ export const getSellerOrders = async (req, res) => {
   try {
     const orders = await Order.find({ seller: req.user.userId })
       .populate("product", "title price images")
-      .populate("user", "username email mobile")
+      .populate("user", "username email mobile profileImage")
       .sort({ createdAt: -1 });
 
     res.json({ success: true, orders });

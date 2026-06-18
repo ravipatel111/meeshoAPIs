@@ -5,7 +5,7 @@ import Order from "../../models/orderModel.js";
 export const getAllRefunds = async (req, res) => {
   try {
     const refunds = await Refund.find()
-      .populate("user", "username email")
+      .populate("user", "username email profileImage")
       .populate("order")
       .populate("payment")
       .sort({ createdAt: -1 });

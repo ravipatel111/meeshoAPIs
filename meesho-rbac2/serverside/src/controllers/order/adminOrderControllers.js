@@ -5,7 +5,7 @@ const VALID_ORDER_STATUSES = ["pending", "confirmed", "shipped", "delivered", "c
 export const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find()
-      .populate("user", "username email mobile")
+      .populate("user", "username email mobile profileImage")
       .populate("seller", "name email")
       .populate("product", "title price images")
       .sort({ createdAt: -1 });
