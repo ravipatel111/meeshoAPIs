@@ -5,10 +5,11 @@ import Admin from "../models/adminModel.js";
 
 export const auth = async (req, res, next) => {
   try {
-    const token =
-      req.cookies.admin_token ||
-      req.cookies.user_token ||
-      req.headers.authorization?.split(" ")[1];
+    const adminToken = req.cookies.admin_token;
+    const userToken = req.cookies.user_token;
+    const headerToken = req.headers.authorization?.split(" ")[1];
+
+    const token = headerToken || adminToken || userToken;
 
     if (!token) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
