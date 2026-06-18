@@ -140,7 +140,16 @@ export const updateProductByAdmin = async (req, res) => {
 
     // Process videos update
     let finalVideos = product.videos || [];
-    if (req.body.existingVideos !== undefined) {
+    if (req.body.removeVideo === "true") {
+      for (let vid of product.videos || []) {
+        if (vid.public_id) {
+          await cloudinary.uploader.destroy(vid.public_id, {
+            resource_type: "video",
+          });
+        }
+      }
+      finalVideos = [];
+    } else if (req.body.existingVideos !== undefined) {
       let existingVideos = req.body.existingVideos;
       if (typeof existingVideos === "string") {
         try {
@@ -196,6 +205,7 @@ export const updateProductByAdmin = async (req, res) => {
     // Clean up temporary body fields
     delete req.body.existingImages;
     delete req.body.existingVideos;
+    delete req.body.removeVideo;
 
     if (req.body.variants) {
       req.body.variants =

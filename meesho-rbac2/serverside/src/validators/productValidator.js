@@ -42,6 +42,7 @@ export const createProductSchema = Joi.object({
   color: Joi.any().optional(),
   colors: Joi.any().optional(),
   videos: Joi.any().optional(),
+  removeVideo: Joi.any().optional(),
 });
 
 export const updateProductSchema = Joi.object({
@@ -61,4 +62,5 @@ export const updateProductSchema = Joi.object({
   color:         Joi.any().optional(),
   colors:        Joi.any().optional(),
   videos:        Joi.any().optional(),
+  removeVideo:   Joi.any().optional(),
 });
