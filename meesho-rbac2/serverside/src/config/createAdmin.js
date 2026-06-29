@@ -19,11 +19,18 @@ const createAdmin = async () => {
         name: adminName,
         email: adminEmail,
         password,
+        role: "superadmin",
       });
 
       console.log(`Static Admin Created: ${adminEmail}`);
     } else {
-      console.log("Admin already exists");
+      if (admin.role !== "superadmin") {
+        admin.role = "superadmin";
+        await admin.save();
+        console.log("Seeded Admin updated to superadmin");
+      } else {
+        console.log("Admin already exists");
+      }
     }
   } catch (error) {
     console.log("Admin create error:", error.message);

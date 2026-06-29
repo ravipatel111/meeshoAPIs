@@ -52,7 +52,11 @@ export const auth = async (req, res, next) => {
         .json({ success: false, message: "Account has been deleted" });
     }
 
-    req.user = decoded;
+    req.user = {
+      ...decoded,
+      adminId: decoded.adminId || account._id,
+      adminRole: account.role || "admin",
+    };
     next();
   } catch (error) {
     res.status(401).json({ success: false, message: "Invalid token" });
@@ -92,6 +96,15 @@ export const isAdmin = (req, res, next) => {
     return res
       .status(403)
       .json({ success: false, message: "Admin only access" });
+  }
+  next();
+};
+
+export const isSuperAdmin = (req, res, next) => {
+  if (req.user.role !== "admin" || req.user.adminRole !== "superadmin") {
+    return res
+      .status(403)
+      .json({ success: false, message: "Super Admin only access" });
   }
   next();
 };

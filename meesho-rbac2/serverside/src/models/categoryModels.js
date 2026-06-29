@@ -26,6 +26,11 @@ const categorySchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Admin",
+      required: true,
+    },
   },
   { timestamps: true }
 );
@@ -61,6 +66,11 @@ const subCategorySchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true,
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Admin",
+      required: true,
     },
   },
   { timestamps: true }

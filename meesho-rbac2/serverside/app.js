@@ -14,6 +14,7 @@ import orderRoutes from "./src/routes/order/orderRoutes.js";
 // import sellerRoutes from "./src/routes/seller/sellerRouter.js"; // seller routes disabled
 // import sellerDashboardRoutes from "./src/routes/seller/sellerDashboard.js"; // seller routes disabled
 import adminRoutes from "./src/routes/admin/adminRoutes.js";
+import subAdminRoutes from "./src/routes/admin/subAdminRoutes.js";
 import paymentRoutes from "./src/routes/payment/paymentRoutes.js";
 import refundRoutes from "./src/routes/refund/refundRoutes.js";
 import wishlistRoutes from "./src/routes/wishlist/wishlistRoutes.js";
@@ -199,6 +200,7 @@ app.use("/api", orderRoutes);         // user + admin
 // app.use("/api", sellerRoutes);        // seller routes disabled
 // app.use("/api", sellerDashboardRoutes); // seller routes disabled
 app.use("/api", adminRoutes);         // admin only
+app.use("/api", subAdminRoutes);
 app.use("/api", paymentRoutes);       // user + admin
 app.use("/api", refundRoutes);        // user + admin (seller block commented)
 app.use("/api", wishlistRoutes);      // user only

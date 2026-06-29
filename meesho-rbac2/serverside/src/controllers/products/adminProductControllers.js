@@ -16,7 +16,10 @@ export const createProductByAdmin = async (req, res) => {
       variants,
     } = req.body;
 
-    const adminId = seller || req.user.adminId;
+    let adminId = seller || req.user.adminId;
+    if (req.user.adminRole === "admin") {
+      adminId = req.user.adminId;
+    }
 
     if (!title || !price || !category || !adminId) {
       return res
@@ -86,6 +89,13 @@ export const updateProductByAdmin = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Product not found" });
+    }
+
+    // Check if sub-admin is trying to update another admin's product
+    if (req.user && req.user.adminRole === "admin" && String(product.seller) !== String(req.user.adminId)) {
+      return res
+        .status(403)
+        .json({ success: false, message: "Access denied. You can only modify your own products." });
     }
 
     // Process images update
@@ -234,6 +244,11 @@ export const getAllProducts = async (req, res) => {
     if (category) query.category = category;
     if (subCategory) query.subCategory = subCategory;
 
+    // Filter products by seller for sub-admins
+    if (req.user && req.user.adminRole === "admin") {
+      query.seller = req.user.adminId;
+    }
+
     const products = await Product.find(query)
       .populate("seller", "name email")
       .populate("category", "name")
@@ -277,6 +292,13 @@ export const deleteProductByAdmin = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Product not found" });
+
+    // Check if sub-admin is trying to delete another admin's product
+    if (req.user && req.user.adminRole === "admin" && String(product.seller) !== String(req.user.adminId)) {
+      return res
+        .status(403)
+        .json({ success: false, message: "Access denied. You can only delete your own products." });
+    }
 
     for (let img of product.images || []) {
       if (img.public_id) await cloudinary.uploader.destroy(img.public_id);

@@ -61,6 +61,7 @@ export const loginAdmin = async (req, res) => {
         _id: admin._id,
         email: admin.email,
         role: "admin",
+        adminRole: admin.role || "admin",
       },
     });
   } catch (error) {

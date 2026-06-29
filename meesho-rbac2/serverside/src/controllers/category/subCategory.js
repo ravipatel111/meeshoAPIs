@@ -18,7 +18,7 @@ export const createSubCategory = async (req, res) => {
       image_public_id = uploaded.public_id;
     }
 
-    const subCategory = await SubCategory.create({ name, slug, category, image, image_public_id });
+    const subCategory = await SubCategory.create({ name, slug, category, image, image_public_id, createdBy: req.user.adminId });
 
     res.status(201).json({ success: true, subCategory });
 
@@ -29,7 +29,11 @@ export const createSubCategory = async (req, res) => {
 
 export const getSubCategories = async (req, res) => {
   try {
-    const subCategories = await SubCategory.find().populate("category", "name");
+    const query = {};
+    if (req.user && req.user.adminRole === "admin") {
+      query.createdBy = req.user.adminId;
+    }
+    const subCategories = await SubCategory.find(query).populate("category", "name").populate("createdBy", "name email");
 
     res.json({ success: true, subCategories });
 
@@ -44,6 +48,10 @@ export const updateSubCategory = async (req, res) => {
 
     if (!subCategory) {
       return res.status(404).json({ success: false, message: "SubCategory not found" });
+    }
+
+    if (req.user && req.user.adminRole === "admin" && String(subCategory.createdBy) !== String(req.user.adminId)) {
+      return res.status(403).json({ success: false, message: "Access denied. You can only modify your own subcategories." });
     }
 
     // if new image uploaded, delete old one from cloudinary
@@ -71,6 +79,10 @@ export const deleteSubCategory = async (req, res) => {
 
     if (!subCategory) {
       return res.status(404).json({ success: false, message: "SubCategory not found" });
+    }
+
+    if (req.user && req.user.adminRole === "admin" && String(subCategory.createdBy) !== String(req.user.adminId)) {
+      return res.status(403).json({ success: false, message: "Access denied. You can only delete your own subcategories." });
     }
 
     // delete image from cloudinary

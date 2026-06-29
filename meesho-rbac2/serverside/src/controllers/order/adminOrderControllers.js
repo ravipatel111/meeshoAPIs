@@ -4,7 +4,12 @@ const VALID_ORDER_STATUSES = ["pending", "confirmed", "shipped", "delivered", "c
 
 export const getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find()
+    const query = {};
+    if (req.user && req.user.adminRole === "admin") {
+      query.seller = req.user.adminId;
+    }
+
+    const orders = await Order.find(query)
       .populate("user", "username email mobile profileImage")
       .populate("seller", "name email")
       .populate("product", "title price images")
@@ -33,11 +38,19 @@ export const updateOrderStatus = async (req, res) => {
       });
     }
 
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      { orderStatus: status },
-      { new: true }
-    );
+    let order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    // Check ownership for sub-admins
+    if (req.user && req.user.adminRole === "admin" && String(order.seller) !== String(req.user.adminId)) {
+      return res.status(403).json({ success: false, message: "Access denied. You can only manage your own orders." });
+    }
+
+    order.orderStatus = status;
+    await order.save();
 
     if (!order) {
       return res.status(404).json({ success: false, message: "Order not found" });
@@ -52,11 +65,20 @@ export const updateOrderStatus = async (req, res) => {
 
 export const resolveDispute = async (req, res) => {
   try {
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      { dispute: false, disputeReason: "" },
-      { new: true }
-    );
+    let order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    // Check ownership for sub-admins
+    if (req.user && req.user.adminRole === "admin" && String(order.seller) !== String(req.user.adminId)) {
+      return res.status(403).json({ success: false, message: "Access denied. You can only manage your own orders." });
+    }
+
+    order.dispute = false;
+    order.disputeReason = "";
+    await order.save();
 
     if (!order) {
       return res.status(404).json({ success: false, message: "Order not found" });

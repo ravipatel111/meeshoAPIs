@@ -23,7 +23,7 @@ export const createCategory = async (req, res) => {
      
     }
    
-    const category = await Category.create({ name, slug, image });
+    const category = await Category.create({ name, slug, image, createdBy: req.user.adminId });
 
     res.status(201).json({ success: true, category });
   } catch (error) {
@@ -33,7 +33,11 @@ export const createCategory = async (req, res) => {
 
 export const getCategories = async (req, res) => {
   try {
-    const categories = await Category.find();
+    const query = {};
+    if (req.user && req.user.adminRole === "admin") {
+      query.createdBy = req.user.adminId;
+    }
+    const categories = await Category.find(query).populate("createdBy", "name email");
 
     res.json({ success: true, categories });
   } catch (error) {
@@ -49,6 +53,12 @@ export const updateCategory = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Category not found" });
+    }
+
+    if (req.user && req.user.adminRole === "admin" && String(category.createdBy) !== String(req.user.adminId)) {
+      return res
+        .status(403)
+        .json({ success: false, message: "Access denied. You can only modify your own categories." });
     }
 
     // if new image uploaded, delete old one from cloudinary
@@ -82,6 +92,12 @@ export const deleteCategory = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Category not found" });
+    }
+
+    if (req.user && req.user.adminRole === "admin" && String(category.createdBy) !== String(req.user.adminId)) {
+      return res
+        .status(403)
+        .json({ success: false, message: "Access denied. You can only delete your own categories." });
     }
 
     // delete image from cloudinary
