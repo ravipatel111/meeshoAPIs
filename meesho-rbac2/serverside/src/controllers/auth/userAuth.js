@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import getotp from "../../utils/otp.js";
 import uploadToCloudinary from "../../utils/uploadToCloudinary.js";
+import sendOtpEmail from "../../utils/sendEmail.js";
 import {
   cookieOptions,
   clearCookieOptions,
@@ -56,11 +57,17 @@ export const registerUser = async (req, res) => {
       otpExpiresAt: Date.now() + 5 * 60 * 1000,
     });
 
+    try {
+      await sendOtpEmail({ to: email, name: username, otp });
+    } catch (emailError) {
+      console.error("Error sending OTP email:", emailError);
+      // We can choose to return an error, but let's proceed to register the user and return the OTP in the response
+    }
+
     res.status(201).json({
       success: true,
       data: user._id,
-      otp,
-      message: "User registered successfully.",
+      message: "User registered successfully. Please check your email for the OTP.",
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

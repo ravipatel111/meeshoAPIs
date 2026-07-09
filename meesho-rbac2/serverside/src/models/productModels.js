@@ -39,6 +39,11 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
 
+    warehouseId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Warehouse",
+    },
+
     images: [
       {
         url: String,

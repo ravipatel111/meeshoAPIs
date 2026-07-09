@@ -1,3 +1,6 @@
+import dns from "node:dns";
+dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
+
 import express from "express";
 import dotenv from "dotenv";
 dotenv.config();
@@ -20,6 +23,8 @@ import refundRoutes from "./src/routes/refund/refundRoutes.js";
 import wishlistRoutes from "./src/routes/wishlist/wishlistRoutes.js";
 import userProfileRoutes from "./src/routes/user/userProfileRoutes.js";
 // import sellerProfileRoutes from "./src/routes/sellerProfile/sellerProfileRoutes.js"; // seller routes disabled
+import shippingRoutes from "./src/routes/shipping.routes.js";
+import trackingRoutes from "./src/routes/tracking.routes.js";
 import createAdmin from "./src/config/createAdmin.js";
 import errorHandler from "./src/middleware/errorHandler.js";
 import swaggerUi from "swagger-ui-express";
@@ -206,6 +211,8 @@ app.use("/api", refundRoutes);        // user + admin (seller block commented)
 app.use("/api", wishlistRoutes);      // user only
 app.use("/api", userProfileRoutes);   // user only
 // app.use("/api", sellerProfileRoutes); // seller profile routes disabled
+app.use("/api", shippingRoutes);
+app.use("/api", trackingRoutes);
 
 // Global error handler — must be last
 app.use(errorHandler);

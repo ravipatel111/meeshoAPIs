@@ -33,7 +33,7 @@ export const getSubCategories = async (req, res) => {
     if (req.user && req.user.adminRole === "admin") {
       query.createdBy = req.user.adminId;
     }
-    const subCategories = await SubCategory.find(query).populate("category", "name").populate("createdBy", "name email");
+    const subCategories = await SubCategory.find(query).populate("category", "name").populate("createdBy", "name email").sort({ createdAt: -1 });
 
     res.json({ success: true, subCategories });
 

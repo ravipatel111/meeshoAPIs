@@ -37,7 +37,7 @@ export const getCategories = async (req, res) => {
     if (req.user && req.user.adminRole === "admin") {
       query.createdBy = req.user.adminId;
     }
-    const categories = await Category.find(query).populate("createdBy", "name email");
+    const categories = await Category.find(query).populate("createdBy", "name email").sort({ createdAt: -1 });
 
     res.json({ success: true, categories });
   } catch (error) {

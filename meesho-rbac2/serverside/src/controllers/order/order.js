@@ -3,7 +3,8 @@ import Order from "../../models/orderModel.js";
 import Product from "../../models/productModels.js";
 import User from "../../models/userModel.js";
 import Payment from "../../models/paymentModel.js";
-
+import Shipment from "../../models/Shipment.js";
+import shiprocketService from "../../services/shiprocket.service.js";
 export const createOrder = async (req, res) => {
   try {
     const { product, quantity, addressId, paymentMethod, variantId } = req.body;
@@ -125,6 +126,58 @@ export const createOrder = async (req, res) => {
       paymentStatus: "paid",
       orderStatus: "confirmed",
     });
+
+    // --- SHIPROCKET INTEGRATION START ---
+    try {
+      const shiprocketPayload = {
+        order_id: order._id.toString(),
+        order_date: new Date().toISOString(),
+        pickup_location: "Primary", // Or get from warehouse
+        billing_customer_name: addressData.fullName || userData.username || "Customer",
+        billing_last_name: "",
+        billing_address: addressData.addressLine,
+        billing_city: addressData.city,
+        billing_pincode: addressData.pincode,
+        billing_state: addressData.state,
+        billing_country: "India",
+        billing_email: userData.email || "noemail@example.com",
+        billing_phone: addressData.mobile || userData.mobile || "0000000000",
+        shipping_is_billing: true,
+        order_items: [
+          {
+            name: productData.title,
+            sku: productData._id.toString(),
+            units: quantity,
+            selling_price: price,
+          }
+        ],
+        payment_method: paymentMethod === 'COD' ? 'COD' : 'Prepaid',
+        sub_total: totalPrice,
+        length: 10, // Default dimensions (can be updated from product data if available)
+        breadth: 10,
+        height: 10,
+        weight: 1, // Default weight in kg
+      };
+
+      const shiprocketRes = await shiprocketService.createShipment(shiprocketPayload);
+      
+      if (shiprocketRes.success) {
+        await Shipment.create({
+          orderId: order._id,
+          shipmentId: shiprocketRes.shipmentId,
+          awb: shiprocketRes.awb,
+          courier: "Pending Courier Assignment",
+          status: "Pending",
+          trackingUrl: "",
+        });
+      } else {
+        console.error("Failed to create Shiprocket order:", shiprocketRes.error);
+        // We let the order succeed locally even if Shiprocket sync fails so the user isn't blocked.
+      }
+    } catch (srError) {
+      console.error("Shiprocket integration error:", srError);
+    }
+    // --- SHIPROCKET INTEGRATION END ---
 
     const populatedOrder = await Order.findById(order._id)
       .populate("product", "title price images")

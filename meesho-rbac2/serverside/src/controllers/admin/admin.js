@@ -5,11 +5,14 @@ import Wishlist from "../../models/wishlistModel.js";
 // import Seller from "../../models/vendorModel.js"; // seller management disabled
 import Product from "../../models/productModels.js";
 import Address from "../../models/addressModel.js";
+import Admin from "../../models/adminModel.js";
 
 export const getAllUsers = async (req, res) => {
   try {
     const users = await User.find({ isDeleted: { $ne: true } }).select("-password").sort({ createdAt: -1 });
-    res.status(200).json({ success: true, count: users.length, users });
+    const admins = await Admin.find({ role: { $ne: "superadmin" } }).select("-password").sort({ createdAt: -1 });
+    const combinedUsers = [...admins, ...users];
+    res.status(200).json({ success: true, count: combinedUsers.length, users: combinedUsers });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -47,7 +50,10 @@ export const getUserDetails = async (req, res) => {
 
 export const blockUser = async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, { isBlocked: true }, { new: true }).select("-password");
+    let user = await User.findByIdAndUpdate(req.params.id, { isBlocked: true }, { new: true }).select("-password");
+    if (!user) {
+      user = await Admin.findByIdAndUpdate(req.params.id, { isBlocked: true }, { new: true }).select("-password");
+    }
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
     res.json({ success: true, message: "User blocked", user });
   } catch (error) {
@@ -57,7 +63,10 @@ export const blockUser = async (req, res) => {
 
 export const unblockUser = async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, { isBlocked: false }, { new: true }).select("-password");
+    let user = await User.findByIdAndUpdate(req.params.id, { isBlocked: false }, { new: true }).select("-password");
+    if (!user) {
+      user = await Admin.findByIdAndUpdate(req.params.id, { isBlocked: false }, { new: true }).select("-password");
+    }
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
     res.json({ success: true, message: "User unblocked", user });
   } catch (error) {
@@ -68,8 +77,20 @@ export const unblockUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await User.findById(id);
+    let user = await User.findById(id);
     if (!user) {
+      const admin = await Admin.findById(id);
+      if (admin) {
+        if (admin.role === "superadmin") {
+          return res.status(400).json({ success: false, message: "Cannot delete a Super Admin account" });
+        }
+        await Admin.findByIdAndDelete(id);
+        return res.status(200).json({
+          success: true,
+          message: "Admin deleted successfully",
+          user: { _id: id }
+        });
+      }
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
