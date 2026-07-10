@@ -161,9 +161,9 @@ app.set("views", path.join(__dirname, "src/views"));
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
-  "http://localhost:5175",
   "http://localhost:3000",
   "http://localhost:3001",
+  "https://meesho-clone-ten-beige.vercel.app",
 ];
 
 if (process.env.CLIENT_URL) {
