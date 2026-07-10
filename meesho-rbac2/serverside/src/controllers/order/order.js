@@ -113,17 +113,19 @@ export const createOrder = async (req, res) => {
 
     const order = await Order.create(orderData);
 
+    const isCOD = paymentMethod.toUpperCase() === "COD";
+
     const payment = await Payment.create({
       order: order._id,
       user: req.user.userId,
       amount: totalPrice,
       paymentMethod,
-      paymentStatus: "success",
-      transactionId: "TXN" + Date.now(),
+      paymentStatus: isCOD ? "pending" : "success",
+      transactionId: isCOD ? undefined : "TXN" + Date.now(),
     });
 
     await Order.findByIdAndUpdate(order._id, {
-      paymentStatus: "paid",
+      paymentStatus: isCOD ? "pending" : "paid",
       orderStatus: "confirmed",
     });
 

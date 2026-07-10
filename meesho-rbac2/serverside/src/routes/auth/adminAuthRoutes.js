@@ -12,7 +12,7 @@ import { changePasswordSchema } from "../../validators/authValidator.js";
 const router = express.Router();
 
 router.post("/login", loginAdmin); // done
-router.post("/logout",auth , isAdmin, logoutAdmin); // done
-router.post("/change-password", auth, isAdmin, validate(changePasswordSchema), changeAdminPassword);
+router.post("/logout", auth, isAdmin, logoutAdmin); // done
+router.post("/change-password", auth, isAdmin, validate(changePasswordSchema), changeAdminPassword); // done
 
 export default router;
