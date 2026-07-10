@@ -164,6 +164,7 @@ const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
   "https://meesho-clone-ten-beige.vercel.app",
+  "https://meesho-clone-ai7p.vercel.app",
 ];
 
 if (process.env.CLIENT_URL) {
