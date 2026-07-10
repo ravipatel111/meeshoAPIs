@@ -47,6 +47,16 @@ const userSchema = new mongoose.Schema(
       type: Date,
     },
 
+    otpAttempts: {
+      type: Number,
+      default: 0,
+    },
+
+    otpBlockUntil: {
+      type: Date,
+      default: null,
+    },
+
     role: {
       type: String,
       default: "user",

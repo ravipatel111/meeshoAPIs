@@ -79,8 +79,15 @@ export const verifyEmailSchema = Joi.object({
 
 // RESET PASSWORD
 export const resetPasswordSchema = Joi.object({
-  token: Joi.string().required().messages({
-    "any.required": "Reset token is required",
+  email: Joi.string().email().required().messages({
+    "string.email": "Please enter a valid email address",
+    "any.required": "Email is required",
+  }),
+
+  otp: Joi.string().length(6).pattern(/^\d+$/).required().messages({
+    "string.length": "OTP must be exactly 6 digits",
+    "string.pattern.base": "OTP must contain only numbers",
+    "any.required": "OTP is required",
   }),
 
   password: Joi.string().min(6).max(32).required().messages({
@@ -139,5 +146,17 @@ export const sellerRegisterSchema = Joi.object({
   confirmpassword: Joi.string().valid(Joi.ref("password")).required().messages({
     "any.only": "Passwords do not match",
     "any.required": "Confirm password is required",
+  }),
+});
+
+// RESEND OTP
+export const resendOtpSchema = Joi.object({
+  email: Joi.string().email().required().messages({
+    "string.email": "Please enter a valid email address",
+    "any.required": "Email is required",
+  }),
+  type: Joi.string().valid("register", "forgot").required().messages({
+    "any.only": "Type must be 'register' or 'forgot'",
+    "any.required": "Type is required",
   }),
 });

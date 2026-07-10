@@ -107,6 +107,8 @@ export const verifyUserOtp = async (req, res) => {
     user.otp = null;
     user.otpExpiresAt = null;
     user.isVerified = true;
+    user.otpAttempts = 0;
+    user.otpBlockUntil = null;
     await user.save();
 
     res
@@ -233,17 +235,35 @@ export const verifyEmailUser = async (req, res) => {
       });
     }
 
-    const token = crypto.randomBytes(32).toString("hex");
+    if (user.otpBlockUntil && user.otpBlockUntil > Date.now()) {
+      return res.status(403).json({ success: false, message: "Too many OTP requests. Please try again after some time." });
+    }
 
-    user.resetToken = token;
+    if (user.otpAttempts >= 5) {
+      user.otpBlockUntil = Date.now() + 15 * 60 * 1000;
+      user.otpAttempts = 0;
+      await user.save();
+      return res.status(403).json({ success: false, message: "Too many OTP requests. Please try again after some time." });
+    }
+
+    user.otpAttempts = (user.otpAttempts || 0) + 1;
+
+    const otp = getotp();
+
+    user.resetToken = otp;
     user.resetTokenExpiry = Date.now() + 10 * 60 * 1000;
 
     await user.save();
 
+    try {
+      await sendOtpEmail({ to: email, name: user.username, otp });
+    } catch (emailError) {
+      console.error("Error sending OTP email:", emailError);
+    }
+
     res.status(200).json({
       success: true,
-      message: "Reset token generated",
-      resetToken: token,
+      message: "Reset OTP sent to your email",
     });
   } catch (error) {
     res.status(500).json({
@@ -255,16 +275,17 @@ export const verifyEmailUser = async (req, res) => {
 
 export const resetUserPassword = async (req, res) => {
   try {
-    const { token, password } = req.body;
+    const { email, otp, password } = req.body;
 
-    if (!token || !password) {
+    if (!email || !otp || !password) {
       return res
         .status(400)
-        .json({ success: false, message: "Token and password required" });
+        .json({ success: false, message: "Email, OTP, and password required" });
     }
 
     const user = await User.findOne({
-      resetToken: token,
+      email,
+      resetToken: otp,
       resetTokenExpiry: { $gt: Date.now() },
     });
 
@@ -277,6 +298,8 @@ export const resetUserPassword = async (req, res) => {
     user.password = await bcrypt.hash(password, 10);
     user.resetToken = null;
     user.resetTokenExpiry = null;
+    user.otpAttempts = 0;
+    user.otpBlockUntil = null;
     await user.save();
 
     res
@@ -325,4 +348,53 @@ export const changeUserPassword = async (req, res) => {
 export const logoutUser = async (req, res) => {
   res.clearCookie("user_token", clearCookieOptions);
   res.json({ success: true, message: "Logged out successfully" });
+};
+
+export const resendOtp = async (req, res) => {
+  try {
+    const { email, type } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    if (user.otpBlockUntil && user.otpBlockUntil > Date.now()) {
+      return res.status(403).json({ success: false, message: "Too many OTP requests. Please try again after some time." });
+    }
+
+    if (user.otpAttempts >= 5) {
+      user.otpBlockUntil = Date.now() + 15 * 60 * 1000;
+      user.otpAttempts = 0;
+      await user.save();
+      return res.status(403).json({ success: false, message: "Too many OTP requests. Please try again after some time." });
+    }
+
+    user.otpAttempts = (user.otpAttempts || 0) + 1;
+    const otp = getotp();
+
+    if (type === "register") {
+      user.otp = otp;
+      user.otpExpiresAt = Date.now() + 5 * 60 * 1000;
+    } else if (type === "forgot") {
+      user.resetToken = otp;
+      user.resetTokenExpiry = Date.now() + 10 * 60 * 1000;
+    }
+
+    await user.save();
+
+    try {
+      await sendOtpEmail({ to: email, name: user.username, otp });
+    } catch (emailError) {
+      console.error("Error sending OTP email:", emailError);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "OTP has been resent to your email",
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
